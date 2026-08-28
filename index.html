@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>বর-বউয়ের রানার - ফিক্সড এডিশন</title>
+  <title>Catch Your Girl</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Hind+Siliguri:wght@500;700&display=swap');
     
@@ -133,9 +133,9 @@
   <canvas id="gameCanvas" width="850" height="420"></canvas>
 
   <div class="controls">
-    <button class="btn" id="btnLeft">◀ পিছে</button>
-    <button class="btn btn-jump" id="btnJump">🦘 লাফ</button>
-    <button class="btn" id="btnRight">সামনে ▶</button>
+    <button class="btn" id="btnLeft">◀ BACK</button>
+    <button class="btn btn-jump" id="btnJump">🦘 JUMP</button>
+    <button class="btn" id="btnRight">FORWARD ▶</button>
   </div>
 </div>
 
@@ -406,9 +406,9 @@ function draw() {
     ctx.textAlign = "center"; ctx.fillStyle = "#ef4444"; ctx.font = "900 34px Orbitron";
     ctx.fillText("GAME OVER", canvas.width / 2, 165);
     ctx.fillStyle = "#fbbf24"; ctx.font = "bold 17px 'Hind Siliguri'";
-    ctx.fillText("ধুর! বর বাধার সাথে আটকে গেল! 💔", canvas.width / 2, 205);
+    ctx.fillText("ধুর! SAYIM আটকে গেল! 💔", canvas.width / 2, 205);
     ctx.fillStyle = "#9ca3af"; ctx.font = "14px 'Hind Siliguri'";
-    ctx.fillText("আবার চেষ্টা করতে স্ক্রিনে স্পর্শ করুন 🔄", canvas.width / 2, 250);
+    ctx.fillText("TAP SCREEN TO TRY AGAIN 🔄", canvas.width / 2, 250);
     ctx.textAlign = "left";
   }
 
@@ -420,9 +420,9 @@ function draw() {
     ctx.textAlign = "center"; ctx.fillStyle = "#4ade80"; ctx.font = "900 36px Orbitron";
     ctx.fillText("VICTORY!! 💍🎉", canvas.width / 2, 170);
     ctx.fillStyle = "#38bdf8"; ctx.font = "bold 18px 'Hind Siliguri'";
-    ctx.fillText(`অভিনন্দন! আপনি ${currentDifficulty.toUpperCase()} মোডে বউকে ধরে ফেলেছেন! ❤️`, canvas.width / 2, 210);
+    ctx.fillText(`অভিনন্দন! আপনি ${currentDifficulty.toUpperCase()} TASFIA কে ধরে ফেলেছেন! ❤️`, canvas.width / 2, 210);
     ctx.fillStyle = "#9ca3af"; ctx.font = "14px 'Hind Siliguri'";
-    ctx.fillText("পুনরায় খেলতে স্ক্রিনে স্পর্শ করুন 🔄", canvas.width / 2, 255);
+    ctx.fillText("TAP SCREEN TO TRY AGAIN 🔄", canvas.width / 2, 255);
     ctx.textAlign = "left";
   }
 }
