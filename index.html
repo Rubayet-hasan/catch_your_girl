@@ -2,10 +2,10 @@
 <html lang="bn">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>বর-বউয়ের রানার - মোবাইল এডিশন</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>বর-বউয়ের রানার - ফিক্সড এডিশন</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Hind+Siliguri:wght@500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Hind+Siliguri:wght@500;700&display=swap');
     
     * { 
       margin: 0; 
@@ -16,7 +16,7 @@
       -webkit-touch-callout: none;
     }
     body {
-      background: #030712;
+      background: #090d16;
       color: #fff;
       display: flex;
       flex-direction: column;
@@ -27,25 +27,27 @@
       font-family: 'Hind Siliguri', sans-serif;
       touch-action: manipulation;
     }
-    .game-wrapper {
+    .game-container {
       position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
-      background: rgba(17, 24, 39, 0.9);
-      padding: 12px;
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(15, 23, 42, 0.95);
+      padding: 10px;
+      border-radius: 20px;
+      border: 2px solid rgba(56, 189, 248, 0.3);
       width: 98vw;
-      max-width: 860px;
+      max-width: 900px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(56, 189, 248, 0.1);
     }
     canvas {
       border: 2px solid #38bdf8;
-      box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
-      background: #0b0f19;
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.3);
+      background: #070a12;
       width: 100%;
       height: auto;
-      border-radius: 12px;
+      aspect-ratio: 850 / 420;
+      border-radius: 14px;
       touch-action: none;
     }
     .top-bar {
@@ -54,29 +56,36 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 8px;
+      padding: 0 4px;
     }
-    .diff-selector { display: flex; gap: 5px; }
+    .diff-selector { display: flex; gap: 6px; }
     .diff-btn {
-      padding: 6px 10px;
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      background: #111827;
+      padding: 6px 12px;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      background: #0f172a;
       color: #9ca3af;
       font-family: 'Orbitron', sans-serif;
       font-size: 11px;
-      border-radius: 6px;
+      font-weight: 800;
+      border-radius: 8px;
       cursor: pointer;
+      transition: all 0.2s ease;
     }
     .diff-btn.active {
-      background: #38bdf8;
+      background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
       color: #030712;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+      border-color: #7dd3fc;
     }
     .audio-btn {
-      background: #111827;
+      background: #0f172a;
       border: 1px solid rgba(255, 255, 255, 0.2);
       color: #fff;
-      padding: 5px 10px;
-      border-radius: 6px;
-      font-size: 11px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
     }
     .controls {
       display: flex;
@@ -87,29 +96,31 @@
     }
     .btn {
       flex: 1;
-      max-width: 120px;
+      max-width: 130px;
       height: 55px;
       background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
       border: none;
-      border-radius: 12px;
+      border-radius: 14px;
       font-size: 16px;
       font-weight: bold;
       color: #fff;
       touch-action: manipulation;
-      box-shadow: 0 4px 0 #075985;
+      box-shadow: 0 5px 0 #075985, 0 8px 15px rgba(0,0,0,0.4);
+      cursor: pointer;
+      transition: background 0.1s;
     }
     .btn-jump {
-      flex: 1.2;
-      max-width: 140px;
+      flex: 1.3;
+      max-width: 150px;
       background: linear-gradient(180deg, #f43f5e 0%, #be123c 100%);
-      box-shadow: 0 4px 0 #9f1239;
+      box-shadow: 0 5px 0 #9f1239, 0 8px 15px rgba(244, 63, 94, 0.3);
     }
-    .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 transparent; }
+    .btn:active { transform: translateY(3px); box-shadow: 0 2px 0 transparent; }
   </style>
 </head>
 <body>
 
-<div class="game-wrapper">
+<div class="game-container">
   <div class="top-bar">
     <div class="diff-selector">
       <button class="diff-btn active" onclick="setDifficulty('easy', event)">EASY</button>
@@ -158,21 +169,31 @@ function playSound(sound) {
 
 let groundY = 340;
 let isGameOver = false, isGameWon = false;
-let score = 0, coins = 0, highScore = 0;
-let baseSpeed = 6, gameSpeed = 6;
-let winTarget = 1000, currentDifficulty = 'easy';
-let shakeTime = 0;
+let score = 0, highScore = 0;
+let baseSpeed = 5, gameSpeed = 5;
+let currentDifficulty = 'easy';
 
-let particles = [];
-let stars = Array.from({length: 30}, () => ({x: Math.random()*850, y: Math.random()*180, speed: Math.random()*0.5 + 0.1}));
+// ব্যাকগ্রাউন্ডের তারা ও নিওন বিল্ডিং
+let stars = Array.from({length: 45}, () => ({x: Math.random()*850, y: Math.random()*190, speed: Math.random()*0.4 + 0.1, size: Math.random()*2 + 1}));
+let cityBuildings = Array.from({length: 12}, (_, i) => ({
+  x: i * 80, 
+  width: 65, 
+  height: 50 + Math.random()*90,
+  color: `rgba(${Math.floor(Math.random()*30 + 15)}, ${Math.floor(Math.random()*40 + 20)}, ${Math.floor(Math.random()*60 + 40)}, 0.8)`
+}));
 
+// বর ও বউ অবজেক্ট (বউ সবসময় নির্দিষ্ট সীমানার মধ্যে থাকবে)
 let bor = { 
-  x: 120, y: groundY - 60, width: 50, height: 60, 
-  speed: 7, vy: 0, gravity: 0.65, 
-  jumpCount: 0, maxJumps: 2, 
-  hasShield: false, shieldTimer: 0, isDead: false 
+  x: 80, y: groundY - 60, width: 50, height: 60, 
+  speed: 7.5, vy: 0, gravity: 0.65, 
+  jumpCount: 0, maxJumps: 2, isDead: false 
 };
-let bou = { x: 380, y: groundY - 60, width: 50, height: 60, vy: 0, gravity: 0.65, isJumping: false };
+
+let bou = { 
+  x: 650, y: groundY - 60, width: 50, height: 60, 
+  baseX: 650,
+  speed: 1.5, vy: 0, gravity: 0.65, isJumping: false 
+};
 
 const obstacleTypes = [
   { type: 'cactus', width: 40, height: 50, img: imgCactus, color: '#22c55e' },
@@ -181,7 +202,6 @@ const obstacleTypes = [
 ];
 
 let obstacle = { x: 850, y: groundY - 50, width: 40, height: 50, typeData: obstacleTypes[0] };
-let activeItem = { x: -100, y: 0, type: 'coin', collected: true };
 let moveLeft = false, moveRight = false;
 
 function setDifficulty(level, e) {
@@ -189,8 +209,16 @@ function setDifficulty(level, e) {
   document.querySelectorAll('.diff-btn').forEach(btn => btn.classList.remove('active'));
   if(e && e.target) e.target.classList.add('active');
 
-  baseSpeed = level === 'easy' ? 6 : (level === 'medium' ? 8 : 10);
-  winTarget = level === 'easy' ? 1000 : (level === 'medium' ? 2000 : 3000);
+  if (level === 'easy') {
+    baseSpeed = 5;
+    bou.baseX = 580; // সহজ: বউ একটু কাছে থাকবে
+  } else if (level === 'medium') {
+    baseSpeed = 7;
+    bou.baseX = 660; // মাঝারি: বউ কিছুটা দূরে
+  } else if (level === 'hard') {
+    baseSpeed = 9;
+    bou.baseX = 730; // কঠিন: বউ একদম স্ক্রিনের শেষ মাথায়!
+  }
   restartGame();
 }
 
@@ -201,7 +229,7 @@ function makeBorJump() {
   }
 }
 
-// মোবাইল টাচ ইভেন্ট সিস্টেম অপটিমাইজেশন
+// মোবাইল টাচ ইভেন্ট লজিক
 const bindTouch = (elem, startFn, endFn) => {
   elem.addEventListener("touchstart", (e) => { e.preventDefault(); startFn(); }, { passive: false });
   elem.addEventListener("touchend", (e) => { e.preventDefault(); if(endFn) endFn(); }, { passive: false });
@@ -227,39 +255,52 @@ window.addEventListener("keyup", (e) => {
 });
 
 function update() {
+  stars.forEach(s => { s.x -= s.speed; if(s.x < 0) s.x = canvas.width; });
+  cityBuildings.forEach(b => { b.x -= gameSpeed * 0.25; if(b.x + b.width < 0) b.x = canvas.width + 10; });
+
   if (!bor.isDead && !isGameWon) {
     score++;
     if (score > highScore) highScore = score;
-    gameSpeed = baseSpeed + Math.floor(score / 250) * 0.5;
+    gameSpeed = baseSpeed + Math.floor(score / 350) * 0.5;
 
-    if (score >= winTarget) {
+    // বরের মুভমেন্ট
+    if (moveLeft && bor.x > 0) bor.x -= bor.speed;
+    if (moveRight) bor.x += bor.speed;
+
+    // বউ স্ক্রিন থেকে বের হবে না! নির্দিষ্ট সীমায় (Bound Grid) আটকে থাকবে
+    let targetBouX = bou.baseX + Math.sin(score * 0.05) * 40; 
+    bou.x = Math.min(canvas.width - bou.width - 15, Math.max(300, targetBouX));
+
+    // বর বউকে ধরে ফেললে (WIN CONDITION)
+    if (bor.x + bor.width >= bou.x + 10) {
       isGameWon = true;
       playSound(soundWin);
     }
 
-    if (moveLeft && bor.x > 0) bor.x -= bor.speed;
-    if (moveRight && bor.x < bou.x - 40) bor.x += bor.speed;
-
+    // বরের ফিজিক্স
     bor.y += bor.vy; bor.vy += bor.gravity;
     if (bor.y >= groundY - bor.height) {
       bor.y = groundY - bor.height;
       bor.jumpCount = 0;
     }
 
+    // বাধা (Obstacle) মুভমেন্ট
     obstacle.x -= gameSpeed;
     if (obstacle.x + obstacle.width < 0) {
       const randomType = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
       obstacle.typeData = randomType;
       obstacle.width = randomType.width;
       obstacle.height = randomType.height;
-      obstacle.x = canvas.width + Math.random() * 150;
+      obstacle.x = canvas.width + Math.random() * 200;
       obstacle.y = (randomType.type === 'pit') ? groundY : groundY - randomType.height;
     }
 
-    if (obstacle.x - (bou.x + bou.width) < 70 && obstacle.x > bou.x && !bou.isJumping) {
+    // বউয়ের অটোজাম্প AI (বাধা আসলেই লাফ দেবে)
+    if (obstacle.x - (bou.x + bou.width) < 65 && obstacle.x > bou.x && !bou.isJumping) {
       bou.vy = -13; bou.isJumping = true;
     }
 
+    // বর বাধার সাথে ধাক্কা খেলে (GAME OVER)
     let isHit = false;
     if (obstacle.typeData.type === 'pit') {
       if (bor.x + bor.width > obstacle.x && bor.x < obstacle.x + obstacle.width && bor.y + bor.height >= groundY) isHit = true;
@@ -273,9 +314,10 @@ function update() {
       playSound(soundLose);
     }
   } else if (bor.isDead) {
-    bou.x += 9;
+    if (bou.x < canvas.width + 100) bou.x += 6; // গেম ওভারে বউ হালকা দূরে চলে যাবে
   }
 
+  // বউয়ের ফিজিক্স
   bou.y += bou.vy; bou.vy += bou.gravity;
   if (bou.y >= groundY - bou.height) { bou.y = groundY - bou.height; bou.isJumping = false; }
 }
@@ -283,12 +325,38 @@ function update() {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = "#0b0f19";
+  // ব্যাকগ্রাউন্ড গ্র্যাডিয়েন্ট
+  let bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  bgGradient.addColorStop(0, "#070a14");
+  bgGradient.addColorStop(0.7, "#0d1527");
+  bgGradient.addColorStop(1, "#172554");
+  ctx.fillStyle = bgGradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.strokeStyle = "#38bdf8"; ctx.lineWidth = 3;
-  ctx.beginPath(); ctx.moveTo(0, groundY); ctx.lineTo(canvas.width, groundY); ctx.stroke();
+  // তারা
+  stars.forEach(s => {
+    ctx.fillStyle = `rgba(255, 255, 255, ${Math.random()*0.5 + 0.5})`;
+    ctx.fillRect(s.x, s.y, s.size, s.size);
+  });
 
+  // নিওন বিল্ডিং
+  cityBuildings.forEach(b => {
+    ctx.fillStyle = b.color;
+    ctx.fillRect(b.x, groundY - b.height, b.width, b.height);
+    ctx.fillStyle = "rgba(253, 224, 71, 0.3)";
+    for(let wy = groundY - b.height + 10; wy < groundY - 10; wy += 20) {
+      ctx.fillRect(b.x + 10, wy, 8, 10);
+      ctx.fillRect(b.x + b.width - 18, wy, 8, 10);
+    }
+  });
+
+  // মাটি (Ground Line)
+  ctx.shadowBlur = 15; ctx.shadowColor = "#38bdf8";
+  ctx.strokeStyle = "#38bdf8"; ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.moveTo(0, groundY); ctx.lineTo(canvas.width, groundY); ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // বাধা (Obstacle)
   if (!isGameWon) {
     if (obstacle.typeData.type === 'pit') {
       ctx.fillStyle = "#030712"; ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, 25);
@@ -300,12 +368,14 @@ function draw() {
     }
   }
 
+  // বউ
   if (imgBou.complete && imgBou.naturalWidth !== 0) {
     ctx.drawImage(imgBou, bou.x, bou.y, bou.width, bou.height);
   } else {
     ctx.fillStyle = "#f43f5e"; ctx.fillRect(bou.x, bou.y, bou.width, bou.height);
   }
 
+  // বর
   if (!bor.isDead) {
     if (imgBor.complete && imgBor.naturalWidth !== 0) {
       ctx.drawImage(imgBor, bor.x, bor.y, bor.width, bor.height);
@@ -314,35 +384,45 @@ function draw() {
     }
   }
 
-  ctx.fillStyle = "rgba(15, 23, 42, 0.75)";
-  ctx.fillRect(15, 15, 200, 60);
-  ctx.font = "bold 13px Orbitron"; ctx.fillStyle = "#38bdf8";
-  ctx.fillText(`SCORE: ${score} / ${winTarget}`, 25, 38);
-  ctx.fillStyle = "#fbbf24"; ctx.fillText(`HIGH: ${highScore}`, 25, 58);
+  // HUD ড্যাশবোর্ড
+  ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+  ctx.strokeStyle = "rgba(56, 189, 248, 0.4)";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.roundRect(15, 12, 240, 68, 10);
+  ctx.fill(); ctx.stroke();
 
+  ctx.font = "bold 12px Orbitron"; ctx.fillStyle = "#38bdf8";
+  ctx.fillText(`MODE: ${currentDifficulty.toUpperCase()}`, 25, 32);
+  let dist = Math.max(0, Math.floor((bou.x - bor.x) / 10));
+  ctx.fillStyle = "#f43f5e"; ctx.fillText(`BOU DISTANCE: ${dist}m 🏃‍♀️`, 25, 50);
+  ctx.fillStyle = "#fbbf24"; ctx.fillText(`HIGH SCORE: ${highScore}`, 25, 68);
+
+  // GAME OVER স্ক্রিন
   if (bor.isDead) {
-    ctx.fillStyle = "rgba(3, 7, 18, 0.9)";
+    ctx.fillStyle = "rgba(3, 7, 18, 0.92)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    if (imgGameOver.complete && imgGameOver.naturalWidth !== 0) ctx.drawImage(imgGameOver, canvas.width/2 - 45, 45, 90, 90);
-    ctx.textAlign = "center"; ctx.fillStyle = "#ef4444"; ctx.font = "900 32px Orbitron";
-    ctx.fillText("GAME OVER", canvas.width / 2, 175);
-    ctx.fillStyle = "#fbbf24"; ctx.font = "16px 'Hind Siliguri'";
-    ctx.fillText("বর আটকে গেছে, বউ পালিয়ে গেছে! 🏃‍♀️💨", canvas.width / 2, 215);
+    if (imgGameOver.complete && imgGameOver.naturalWidth !== 0) ctx.drawImage(imgGameOver, canvas.width/2 - 45, 35, 90, 90);
+    ctx.textAlign = "center"; ctx.fillStyle = "#ef4444"; ctx.font = "900 34px Orbitron";
+    ctx.fillText("GAME OVER", canvas.width / 2, 165);
+    ctx.fillStyle = "#fbbf24"; ctx.font = "bold 17px 'Hind Siliguri'";
+    ctx.fillText("ধুর! বর বাধার সাথে আটকে গেল! 💔", canvas.width / 2, 205);
     ctx.fillStyle = "#9ca3af"; ctx.font = "14px 'Hind Siliguri'";
-    ctx.fillText("পুনরায় খেলতে স্ক্রিনে স্পর্শ করুন", canvas.width / 2, 255);
+    ctx.fillText("আবার চেষ্টা করতে স্ক্রিনে স্পর্শ করুন 🔄", canvas.width / 2, 250);
     ctx.textAlign = "left";
   }
 
+  // VICTORY SCREEN
   if (isGameWon) {
-    ctx.fillStyle = "rgba(3, 7, 18, 0.9)";
+    ctx.fillStyle = "rgba(3, 7, 18, 0.92)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    if (imgWin.complete && imgWin.naturalWidth !== 0) ctx.drawImage(imgWin, canvas.width/2 - 50, 40, 100, 100);
-    ctx.textAlign = "center"; ctx.fillStyle = "#4ade80"; ctx.font = "900 34px Orbitron";
-    ctx.fillText("VICTORY!! 🎉", canvas.width / 2, 180);
-    ctx.fillStyle = "#fbbf24"; ctx.font = "bold 16px 'Hind Siliguri'";
-    ctx.fillText(`অভিনন্দন! আপনি জয়ী হয়েছেন!`, canvas.width / 2, 215);
+    if (imgWin.complete && imgWin.naturalWidth !== 0) ctx.drawImage(imgWin, canvas.width/2 - 50, 35, 100, 100);
+    ctx.textAlign = "center"; ctx.fillStyle = "#4ade80"; ctx.font = "900 36px Orbitron";
+    ctx.fillText("VICTORY!! 💍🎉", canvas.width / 2, 170);
+    ctx.fillStyle = "#38bdf8"; ctx.font = "bold 18px 'Hind Siliguri'";
+    ctx.fillText(`অভিনন্দন! আপনি ${currentDifficulty.toUpperCase()} মোডে বউকে ধরে ফেলেছেন! ❤️`, canvas.width / 2, 210);
     ctx.fillStyle = "#9ca3af"; ctx.font = "14px 'Hind Siliguri'";
-    ctx.fillText("পুনরায় খেলতে স্ক্রিনে স্পর্শ করুন", canvas.width / 2, 255);
+    ctx.fillText("পুনরায় খেলতে স্ক্রিনে স্পর্শ করুন 🔄", canvas.width / 2, 255);
     ctx.textAlign = "left";
   }
 }
@@ -358,8 +438,14 @@ function restartGame() {
   soundLose.pause(); soundLose.currentTime = 0;
   isGameOver = false; isGameWon = false; bor.isDead = false;
   score = 0; gameSpeed = baseSpeed;
-  bor.x = 120; bor.y = groundY - bor.height; bor.jumpCount = 0;
-  bou.x = 380; obstacle.x = 850;
+  bor.x = 80; bor.y = groundY - bor.height; bor.jumpCount = 0;
+  
+  if (currentDifficulty === 'easy') bou.baseX = 580;
+  else if (currentDifficulty === 'medium') bou.baseX = 660;
+  else if (currentDifficulty === 'hard') bou.baseX = 730;
+  
+  bou.x = bou.baseX;
+  obstacle.x = 850;
 }
 
 canvas.addEventListener("touchstart", (e) => { 
