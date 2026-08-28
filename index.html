@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>বর-বউয়ের রানার - প্রো এডিশন</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Hind+Siliguri:wght@500;700&display=swap');
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #030712;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+      font-family: 'Hind Siliguri', 'Segoe UI', sans-serif;
+    }
+    .game-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(17, 24, 39, 0.8);
+      padding: 16px;
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    }
+    canvas {
+      border: 2px solid #38bdf8;
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.2);
+      background: #0b0f19;
+      max-width: 100%;
+      border-radius: 16px;
+    }
+    .top-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .diff-selector { display: flex; gap: 8px; }
+    .diff-btn {
+      padding: 6px 14px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      background: #111827;
+      color: #9ca3af;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .diff-btn.active {
+      background: #38bdf8;
+      color: #030712;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+    }
+    .audio-btn {
+      background: #111827;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .controls {
+      display: flex;
+      gap: 15px;
+      margin-top: 15px;
+    }
+    .btn {
+      width: 90px;
+      height: 50px;
+      background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: bold;
+      color: #fff;
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+      box-shadow: 0 4px 0 #075985;
+    }
+    .btn-jump {
+      background: linear-gradient(180deg, #f43f5e 0%, #be123c 100%);
+      box-shadow: 0 4px 0 #9f1239;
+      width: 110px;
+    }
+    .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 transparent; }
+  </style>
+</head>
+<body>
+
+<div class="game-wrapper">
+  <div class="top-bar">
+    <div class="diff-selector">
+      <button class="diff-btn active" onclick="setDifficulty('easy', event)">EASY</button>
+      <button class="diff-btn" onclick="setDifficulty('medium', event)">MEDIUM</button>
+      <button class="diff-btn" onclick="setDifficulty('hard', event)">HARD</button>
+    </div>
+    <button class="audio-btn" id="audioToggle" onclick="toggleAudio()">🔊 Sound: ON</button>
+  </div>
+
+  <canvas id="gameCanvas" width="850" height="420"></canvas>
+
+  <div class="controls">
+    <button class="btn" id="btnLeft">◀ পিছে</button>
+    <button class="btn btn-jump" id="btnJump">🦘 লাফ</button>
+    <button class="btn" id="btnRight">সামনে ▶</button>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+// ১. ইমেজ প্রিলোডার
+const imgBou = new Image(); imgBou.src = 'bou.jpg'; 
+const imgBor = new Image(); imgBor.src = 'bor.jpg'; 
+const imgGameOver = new Image(); imgGameOver.src = 'gameover.jpg'; 
+const imgWin = new Image(); imgWin.src = 'win.jpg'; 
+
+const imgCactus = new Image(); imgCactus.src = 'https://cdn-icons-png.flaticon.com/512/3532/3532731.png';
+const imgRock = new Image(); imgRock.src = 'https://cdn-icons-png.flaticon.com/512/2909/2909772.png';
+
+// ২. কাস্টম অডিও
+const soundWin = new Audio('win.mp3');
+const soundLose = new Audio('lose.mp3');
+let isMuted = false;
+
+function toggleAudio() {
+  isMuted = !isMuted;
+  document.getElementById('audioToggle').innerText = isMuted ? "🔇 Sound: OFF" : "🔊 Sound: ON";
+}
+
+function playSound(sound) {
+  if (!isMuted) {
+    sound.currentTime = 0;
+    sound.play().catch(() => {});
+  }
+}
+
+// ৩. ইঞ্জিন ভ্যারিয়েবল
+let groundY = 340;
+let isGameOver = false, isGameWon = false;
+let score = 0, coins = 0, highScore = 0;
+let baseSpeed = 6, gameSpeed = 6;
+let winTarget = 1000, currentDifficulty = 'easy';
+let shakeTime = 0;
+
+let particles = [];
+let stars = Array.from({length: 40}, () => ({x: Math.random()*850, y: Math.random()*180, speed: Math.random()*0.5 + 0.1}));
+let cityBuildings = Array.from({length: 10}, (_, i) => ({x: i * 90, width: 70, height: 60 + Math.random()*80}));
+
+// ক্যারেক্টার অবজেক্ট (Double Jump & Shield সহ)
+let bor = { 
+  x: 120, y: groundY - 60, width: 50, height: 60, 
+  speed: 7, vy: 0, gravity: 0.65, 
+  jumpCount: 0, maxJumps: 2, 
+  hasShield: false, shieldTimer: 0, isDead: false 
+};
+let bou = { x: 380, y: groundY - 60, width: 50, height: 60, vy: 0, gravity: 0.65, isJumping: false };
+
+// আইটেমস ও অবস্ট্যাকল
+const obstacleTypes = [
+  { type: 'cactus', width: 40, height: 50, img: imgCactus, color: '#22c55e' },
+  { type: 'rock', width: 45, height: 35, img: imgRock, color: '#64748b' },
+  { type: 'pit', width: 50, height: 15, img: null, color: '#0f172a' }
+];
+
+let obstacle = { x: 850, y: groundY - 50, width: 40, height: 50, typeData: obstacleTypes[0] };
+let activeItem = { x: -100, y: 0, type: 'coin', collected: true }; // 'coin' or 'shield'
+
+let moveLeft = false, moveRight = false;
+
+function setDifficulty(level, e) {
+  currentDifficulty = level;
+  document.querySelectorAll('.diff-btn').forEach(btn => btn.classList.remove('active'));
+  if(e && e.target) e.target.classList.add('active');
+
+  baseSpeed = level === 'easy' ? 6 : (level === 'medium' ? 8 : 10);
+  winTarget = level === 'easy' ? 1000 : (level === 'medium' ? 2000 : 3000);
+  restartGame();
+}
+
+function spawnItem() {
+  if (Math.random() < 0.5) {
+    activeItem = {
+      x: canvas.width + Math.random() * 300,
+      y: groundY - (Math.random() * 80 + 40),
+      type: Math.random() < 0.25 ? 'shield' : 'coin',
+      collected: false
+    };
+  }
+}
+
+function createExplosion(x, y, colorArray) {
+  for (let i = 0; i < 30; i++) {
+    particles.push({
+      x: x, y: y,
+      vx: (Math.random() - 0.5) * 10,
+      vy: (Math.random() - 0.5) * 10,
+      size: Math.random() * 5 + 2,
+      color: colorArray[Math.floor(Math.random() * colorArray.length)],
+      life: 1
+    });
+  }
+}
+
+function makeBorJump() {
+  if (bor.jumpCount < bor.maxJumps && !bor.isDead && !isGameWon) {
+    bor.vy = -12;
+    bor.jumpCount++;
+    createExplosion(bor.x + 25, bor.y + 55, ['#38bdf8', '#ffffff']);
+  }
+}
+
+// ইনপুট ইভেন্ট
+window.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowLeft" || e.key === "a") moveLeft = true;
+  if (e.key === "ArrowRight" || e.key === "d") moveRight = true;
+  if (e.key === "ArrowUp" || e.key === "w" || e.key === " ") {
+    if (isGameOver || isGameWon) restartGame();
+    else makeBorJump();
+  }
+});
+window.addEventListener("keyup", (e) => {
+  if (e.key === "ArrowLeft" || e.key === "a") moveLeft = false;
+  if (e.key === "ArrowRight" || e.key === "d") moveRight = false;
+});
+
+const btnLeft = document.getElementById("btnLeft");
+const btnRight = document.getElementById("btnRight");
+const btnJump = document.getElementById("btnJump");
+
+btnLeft.addEventListener("touchstart", (e) => { e.preventDefault(); moveLeft = true; });
+btnLeft.addEventListener("touchend", () => moveLeft = false);
+btnRight.addEventListener("touchstart", (e) => { e.preventDefault(); moveRight = true; });
+btnRight.addEventListener("touchend", () => moveRight = false);
+btnJump.addEventListener("touchstart", (e) => { e.preventDefault(); makeBorJump(); });
+
+btnLeft.addEventListener("mousedown", () => moveLeft = true);
+btnLeft.addEventListener("mouseup", () => moveLeft = false);
+btnRight.addEventListener("mousedown", () => moveRight = true);
+btnRight.addEventListener("mouseup", () => moveRight = false);
+btnJump.addEventListener("click", () => makeBorJump());
+
+// ৪. গেম লুপ ও আপডেট
+function update() {
+  if (shakeTime > 0) shakeTime--;
+
+  // প্যারালাক্স ব্যাকগ্রাউন্ড
+  stars.forEach(s => { s.x -= s.speed; if(s.x < 0) s.x = canvas.width; });
+  cityBuildings.forEach(b => { b.x -= gameSpeed * 0.2; if(b.x + b.width < 0) b.x = canvas.width + 20; });
+
+  if (!bor.isDead && !isGameWon) {
+    score++;
+    if (score > highScore) highScore = score;
+    gameSpeed = baseSpeed + Math.floor(score / 250) * 0.5;
+
+    if (score >= winTarget) {
+      isGameWon = true;
+      playSound(soundWin);
+      createExplosion(canvas.width/2, canvas.height/2, ['#38bdf8', '#4ade80', '#fbbf24']);
+    }
+
+    if (moveLeft && bor.x > 0) bor.x -= bor.speed;
+    if (moveRight && bor.x < bou.x - 40) bor.x += bor.speed;
+
+    // ফিজিক্স আপডেট
+    bor.y += bor.vy; bor.vy += bor.gravity;
+    if (bor.y >= groundY - bor.height) {
+      bor.y = groundY - bor.height;
+      bor.jumpCount = 0; // গ্রাউন্ডে ল্যান্ড করলে জাম্প রিসেট
+    }
+
+    // শিল্ড টাইমার
+    if (bor.hasShield) {
+      bor.shieldTimer--;
+      if (bor.shieldTimer <= 0) bor.hasShield = false;
+    }
+
+    // আইটেম কালেকশন
+    if (!activeItem.collected) {
+      activeItem.x -= gameSpeed;
+      if (Math.hypot((bor.x + 25) - activeItem.x, (bor.y + 30) - activeItem.y) < 35) {
+        activeItem.collected = true;
+        if (activeItem.type === 'coin') { coins += 10; score += 50; }
+        else if (activeItem.type === 'shield') { bor.hasShield = true; bor.shieldTimer = 500; }
+        createExplosion(activeItem.x, activeItem.y, ['#fbbf24', '#ffffff']);
+      }
+    }
+
+    // অবস্ট্যাকল মুভমেন্ট
+    obstacle.x -= gameSpeed;
+    if (obstacle.x + obstacle.width < 0) {
+      const randomType = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
+      obstacle.typeData = randomType;
+      obstacle.width = randomType.width;
+      obstacle.height = randomType.height;
+      obstacle.x = canvas.width + Math.random() * 150;
+      obstacle.y = (randomType.type === 'pit') ? groundY : groundY - randomType.height;
+      spawnItem();
+    }
+
+    // বউ অটোজাম্প AI
+    if (obstacle.x - (bou.x + bou.width) < 70 && obstacle.x > bou.x && !bou.isJumping) {
+      bou.vy = -13; bou.isJumping = true;
+    }
+
+    // কোলিশন ডিটেকশন
+    let isHit = false;
+    if (obstacle.typeData.type === 'pit') {
+      if (bor.x + bor.width > obstacle.x && bor.x < obstacle.x + obstacle.width && bor.y + bor.height >= groundY) isHit = true;
+    } else {
+      if (bor.x < obstacle.x + obstacle.width - 5 && bor.x + bor.width - 5 > obstacle.x && bor.y < obstacle.y + obstacle.height && bor.y + bor.height > obstacle.y) isHit = true;
+    }
+
+    if (isHit) {
+      if (bor.hasShield) {
+        bor.hasShield = false; // শিল্ড আঘাত রক্ষা করবে
+        obstacle.x = -100;
+        createExplosion(bor.x, bor.y, ['#38bdf8', '#60a5fa']);
+      } else {
+        bor.isDead = true;
+        isGameOver = true;
+        shakeTime = 15; // স্ক্রিন শেইক
+        playSound(soundLose);
+        createExplosion(bor.x + 25, bor.y + 30, ['#ef4444', '#fbbf24']);
+      }
+    }
+  } else if (bor.isDead) {
+    bou.x += 9;
+  }
+
+  bou.y += bou.vy; bou.vy += bou.gravity;
+  if (bou.y >= groundY - bou.height) { bou.y = groundY - bou.height; bou.isJumping = false; }
+
+  particles.forEach((p, i) => {
+    p.x += p.vx; p.y += p.vy; p.life -= 0.025;
+    if (p.life <= 0) particles.splice(i, 1);
+  });
+}
+
+// ৫. ড্র রেন্ডারিং (Professional Aesthetics)
+function draw() {
+  ctx.save();
+  
+  // ক্যামেরা শেইক ইফেক্ট
+  if (shakeTime > 0) {
+    let dx = (Math.random() - 0.5) * 10;
+    let dy = (Math.random() - 0.5) * 10;
+    ctx.translate(dx, dy);
+  }
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // প্যারালাক্স ব্যাকগ্রাউন্ড এবং তারকামণ্ডল
+  stars.forEach(s => { ctx.fillStyle = "rgba(255,255,255,0.6)"; ctx.fillRect(s.x, s.y, 2, 2); });
+  cityBuildings.forEach(b => {
+    ctx.fillStyle = "rgba(17, 24, 39, 0.9)";
+    ctx.fillRect(b.x, groundY - b.height, b.width, b.height);
+  });
+
+  // সাইবারপাঙ্ক নিওন ফ্লোর
+  ctx.shadowBlur = 12; ctx.shadowColor = "#38bdf8";
+  ctx.strokeStyle = "#38bdf8"; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(0, groundY); ctx.lineTo(canvas.width, groundY); ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // আইটেমস ড্র (Coin / Shield)
+  if (!activeItem.collected) {
+    ctx.beginPath();
+    ctx.arc(activeItem.x, activeItem.y, 12, 0, Math.PI * 2);
+    if (activeItem.type === 'coin') {
+      ctx.fillStyle = "#fbbf24"; ctx.shadowColor = "#fbbf24"; ctx.shadowBlur = 10;
+      ctx.fill(); ctx.fillStyle = "#000"; ctx.font = "bold 12px Orbitron"; ctx.fillText("$", activeItem.x - 4, activeItem.y + 4);
+    } else {
+      ctx.fillStyle = "#38bdf8"; ctx.shadowColor = "#38bdf8"; ctx.shadowBlur = 10; ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+  }
+
+  // অবস্ট্যাকল
+  if (!isGameWon) {
+    if (obstacle.typeData.type === 'pit') {
+      ctx.fillStyle = "#030712"; ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, 25);
+      ctx.strokeStyle = "#ef4444"; ctx.strokeRect(obstacle.x, obstacle.y, obstacle.width, 25);
+    } else if (obstacle.typeData.img && obstacle.typeData.img.complete && obstacle.typeData.img.naturalWidth !== 0) {
+      ctx.drawImage(obstacle.typeData.img, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+    } else {
+      ctx.fillStyle = obstacle.typeData.color; ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+    }
+  }
+
+  // বউ
+  if (imgBou.complete && imgBou.naturalWidth !== 0) {
+    ctx.drawImage(imgBou, bou.x, bou.y, bou.width, bou.height);
+  } else {
+    ctx.fillStyle = "#f43f5e"; ctx.fillRect(bou.x, bou.y, bou.width, bou.height);
+  }
+
+  // বর + শিল্ড গ্লো
+  if (!bor.isDead) {
+    if (bor.hasShield) {
+      ctx.shadowBlur = 18; ctx.shadowColor = "#38bdf8";
+      ctx.strokeStyle = "#38bdf8"; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(bor.x + 25, bor.y + 30, 38, 0, Math.PI * 2); ctx.stroke();
+    }
+    if (imgBor.complete && imgBor.naturalWidth !== 0) {
+      ctx.drawImage(imgBor, bor.x, bor.y, bor.width, bor.height);
+    } else {
+      ctx.fillStyle = "#0284c7"; ctx.fillRect(bor.x, bor.y, bor.width, bor.height);
+    }
+    ctx.shadowBlur = 0;
+  }
+
+  // পার্টিকেলস
+  particles.forEach(p => {
+    ctx.fillStyle = p.color; ctx.globalAlpha = p.life;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+    ctx.globalAlpha = 1;
+  });
+
+  // প্রফেশনাল HUD UI
+  ctx.fillStyle = "rgba(15, 23, 42, 0.75)";
+  ctx.roundRect(15, 15, 230, 75, 12); ctx.fill();
+  ctx.strokeStyle = "rgba(56, 189, 248, 0.3)"; ctx.stroke();
+
+  ctx.font = "bold 13px Orbitron"; ctx.fillStyle = "#38bdf8";
+  ctx.fillText(`SCORE: ${score} / ${winTarget}`, 30, 38);
+  ctx.fillStyle = "#fbbf24"; ctx.fillText(`COINS: ${coins} 🪙`, 30, 58);
+  ctx.fillStyle = "#9ca3af"; ctx.fillText(`HIGH: ${highScore}`, 30, 76);
+
+  // GAME OVER OVERLAY
+  if (bor.isDead) {
+    ctx.fillStyle = "rgba(3, 7, 18, 0.9)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    if (imgGameOver.complete && imgGameOver.naturalWidth !== 0) ctx.drawImage(imgGameOver, canvas.width/2 - 45, 45, 90, 90);
+
+    ctx.textAlign = "center"; ctx.fillStyle = "#ef4444"; ctx.font = "900 36px Orbitron";
+    ctx.fillText("GAME OVER", canvas.width / 2, 175);
+    ctx.fillStyle = "#fbbf24"; ctx.font = "18px 'Hind Siliguri'";
+    ctx.fillText("বর আটকে গেছে, বউ পালিয়ে গেছে! 🏃‍♀️💨", canvas.width / 2, 215);
+    ctx.fillStyle = "#9ca3af"; ctx.font = "14px Orbitron";
+    ctx.fillText("PRESS SPACE OR CLICK TO RESTART", canvas.width / 2, 260);
+    ctx.textAlign = "left";
+  }
+
+  // WIN OVERLAY
+  if (isGameWon) {
+    ctx.fillStyle = "rgba(3, 7, 18, 0.9)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    if (imgWin.complete && imgWin.naturalWidth !== 0) ctx.drawImage(imgWin, canvas.width/2 - 50, 40, 100, 100);
+
+    ctx.textAlign = "center"; ctx.fillStyle = "#4ade80"; ctx.font = "900 38px Orbitron";
+    ctx.fillText("VICTORY!! 🎉", canvas.width / 2, 180);
+    ctx.fillStyle = "#fbbf24"; ctx.font = "bold 18px 'Hind Siliguri'";
+    ctx.fillText(`অভিনন্দন! আপনি ${currentDifficulty.toUpperCase()} মোডে জয়ী হয়েছেন!`, canvas.width / 2, 220);
+    ctx.fillStyle = "#9ca3af"; ctx.font = "14px Orbitron";
+    ctx.fillText("PRESS SPACE OR CLICK TO RESTART", canvas.width / 2, 265);
+    ctx.textAlign = "left";
+  }
+
+  ctx.restore();
+}
+
+function gameLoop() {
+  update();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+function restartGame() {
+  soundWin.pause(); soundWin.currentTime = 0;
+  soundLose.pause(); soundLose.currentTime = 0;
+  isGameOver = false; isGameWon = false; bor.isDead = false;
+  score = 0; coins = 0; gameSpeed = baseSpeed;
+  bor.x = 120; bor.y = groundY - bor.height; bor.jumpCount = 0; bor.hasShield = false;
+  bou.x = 380; obstacle.x = 850; particles = [];
+}
+
+canvas.addEventListener("click", () => { if (isGameOver || isGameWon) restartGame(); });
+
+gameLoop();
+</script>
+</body>
+</html>
