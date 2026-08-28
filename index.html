@@ -187,26 +187,26 @@ let cityBuildings = Array.from({length: 12}, (_, i) => ({
   color: `rgba(${Math.floor(Math.random()*30 + 15)}, ${Math.floor(Math.random()*40 + 20)}, ${Math.floor(Math.random()*60 + 40)}, 0.8)`
 }));
 
-// বর ও বউ অবজেক্ট (বউ সবসময় নির্দিষ্ট সীমানার মধ্যে থাকবে)
+// বর ও বউ অবজেক্ট (সাইজ বড় করা হয়েছে)
 let bor = { 
-  x: 80, y: groundY - 60, width: 50, height: 60, 
+  x: 80, y: groundY - 80, width: 70, height: 80, 
   speed: 7.5, vy: 0, gravity: 0.65, 
   jumpCount: 0, maxJumps: 2, isDead: false 
 };
 
 let bou = { 
-  x: 650, y: groundY - 60, width: 50, height: 60, 
+  x: 650, y: groundY - 80, width: 70, height: 80, 
   baseX: 650,
   speed: 1.5, vy: 0, gravity: 0.65, isJumping: false 
 };
 
 const obstacleTypes = [
-  { type: 'cactus', width: 40, height: 50, img: imgCactus, color: '#22c55e' },
-  { type: 'rock', width: 45, height: 35, img: imgRock, color: '#64748b' },
-  { type: 'pit', width: 50, height: 15, img: null, color: '#0f172a' }
+  { type: 'cactus', width: 55, height: 70, img: imgCactus, color: '#22c55e' },
+  { type: 'rock', width: 60, height: 50, img: imgRock, color: '#64748b' },
+  { type: 'pit', width: 65, height: 15, img: null, color: '#0f172a' }
 ];
 
-let obstacle = { x: 850, y: groundY - 50, width: 40, height: 50, typeData: obstacleTypes[0] };
+let obstacle = { x: 850, y: groundY - 70, width: 55, height: 70, typeData: obstacleTypes[0] };
 let moveLeft = false, moveRight = false;
 
 function setDifficulty(level, e) {
@@ -216,13 +216,13 @@ function setDifficulty(level, e) {
 
   if (level === 'easy') {
     baseSpeed = 5;
-    bou.baseX = 580; // সহজ: বউ একটু কাছে থাকবে
+    bou.baseX = 580;
   } else if (level === 'medium') {
     baseSpeed = 7;
-    bou.baseX = 660; // মাঝারি: বউ কিছুটা দূরে
+    bou.baseX = 660;
   } else if (level === 'hard') {
     baseSpeed = 9;
-    bou.baseX = 730; // কঠিন: বউ একদম স্ক্রিনের শেষ মাথায়!
+    bou.baseX = 730;
   }
   restartGame();
 }
@@ -272,7 +272,7 @@ function update() {
     if (moveLeft && bor.x > 0) bor.x -= bor.speed;
     if (moveRight) bor.x += bor.speed;
 
-    // বউ স্ক্রিন থেকে বের হবে না! নির্দিষ্ট সীমায় (Bound Grid) আটকে থাকবে
+    // বউ স্ক্রিন থেকে বের হবে না! নির্দিষ্ট সীমায় আটকে থাকবে
     let targetBouX = bou.baseX + Math.sin(score * 0.05) * 40; 
     bou.x = Math.min(canvas.width - bou.width - 15, Math.max(300, targetBouX));
 
@@ -300,7 +300,7 @@ function update() {
       obstacle.y = (randomType.type === 'pit') ? groundY : groundY - randomType.height;
     }
 
-    // বউয়ের অটোজাম্প AI (বাধা আসলেই লাফ দেবে)
+    // বউয়ের অটোজাম্প AI
     if (obstacle.x - (bou.x + bou.width) < 65 && obstacle.x > bou.x && !bou.isJumping) {
       bou.vy = -13; bou.isJumping = true;
     }
@@ -319,7 +319,7 @@ function update() {
       playSound(soundLose);
     }
   } else if (bor.isDead) {
-    if (bou.x < canvas.width + 100) bou.x += 6; // গেম ওভারে বউ হালকা দূরে চলে যাবে
+    if (bou.x < canvas.width + 100) bou.x += 6;
   }
 
   // বউয়ের ফিজিক্স
