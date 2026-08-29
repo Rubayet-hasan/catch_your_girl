@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Catch Your Girl - Touch & Play</title>
+  <title>Catch Your Girl - HD Edition</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Hind+Siliguri:wght@600;700;800&display=swap');
     
@@ -103,16 +103,17 @@
     .tap-hint {
       position: absolute;
       bottom: 25px;
-      color: rgba(255, 255, 255, 0.7);
+      color: rgba(255, 255, 255, 0.85);
       font-size: 16px;
       font-weight: 700;
       letter-spacing: 1px;
       pointer-events: none;
       animation: pulse 1.5s infinite;
+      text-shadow: 0 0 10px rgba(56, 189, 248, 0.8);
     }
 
     @keyframes pulse {
-      0%, 100% { opacity: 0.4; transform: scale(0.98); }
+      0%, 100% { opacity: 0.5; transform: scale(0.98); }
       50% { opacity: 1; transform: scale(1.02); }
     }
   </style>
@@ -167,7 +168,7 @@ let score = 0, highScore = 0;
 let baseSpeed = 5, gameSpeed = 5;
 let currentDifficulty = 'easy';
 
-// ব্যাকগ্রাউন্ডের তারা ও নিওন বিল্ডিং
+// ব্যাকগ্রাউন্ড
 let stars = Array.from({length: 50}, () => ({x: Math.random()*900, y: Math.random()*190, speed: Math.random()*0.5 + 0.1, size: Math.random()*2.5 + 1}));
 let cityBuildings = Array.from({length: 12}, (_, i) => ({
   x: i * 85, 
@@ -176,10 +177,10 @@ let cityBuildings = Array.from({length: 12}, (_, i) => ({
   color: `rgba(${Math.floor(Math.random()*30 + 15)}, ${Math.floor(Math.random()*40 + 20)}, ${Math.floor(Math.random()*70 + 40)}, 0.85)`
 }));
 
-// বর ক্যারেক্টার (স্বয়ংক্রিয়ভাবে আস্তে আস্তে সামনে যাবে)
+// বর ক্যারেক্টার
 let bor = { 
   x: 60, y: groundY - 80, width: 65, height: 80, 
-  autoForwardSpeed: 0.45, // আস্তে আস্তে সামনে এগিয়ে যাওয়ার স্পিড
+  autoForwardSpeed: 0.45, 
   vy: 0, gravity: 0.65, 
   jumpCount: 0, maxJumps: 2, isDead: false 
 };
@@ -190,13 +191,14 @@ let bou = {
   speed: 1.5, vy: 0, gravity: 0.65, isJumping: false 
 };
 
+// অত্যন্ত স্পষ্ট ও আকর্ষণীয় বাধার তালিকা
 const obstacleTypes = [
-  { type: 'cactus', width: 50, height: 65, img: imgCactus, color: '#22c55e' },
-  { type: 'rock', width: 55, height: 45, img: imgRock, color: '#64748b' },
-  { type: 'pit', width: 60, height: 20, img: null, color: '#0f172a' }
+  { type: 'cactus', width: 55, height: 75, img: imgCactus },
+  { type: 'rock', width: 65, height: 50, img: imgRock },
+  { type: 'pit', width: 75, height: 25, img: null }
 ];
 
-let obstacle = { x: 900, y: groundY - 65, width: 50, height: 65, typeData: obstacleTypes[0] };
+let obstacle = { x: 900, y: groundY - 75, width: 55, height: 75, typeData: obstacleTypes[0] };
 
 function setDifficulty(level, e) {
   currentDifficulty = level;
@@ -228,7 +230,6 @@ function handleTapAction() {
   }
 }
 
-// স্ক্রিনের বা ক্যানভাসের যেকোনো জায়গায় ক্লিক বা টাচ করলে লাফ দেবে
 window.addEventListener("touchstart", (e) => {
   if (e.target.tagName !== 'BUTTON') {
     e.preventDefault();
@@ -257,29 +258,24 @@ function update() {
     if (score > highScore) highScore = score;
     gameSpeed = baseSpeed + Math.floor(score / 400) * 0.4;
 
-    // বর আস্তে আস্তে স্বয়ংক্রিয়ভাবে সামনে এগিয়ে যাবে
     if (bor.x < bou.x - 30) {
       bor.x += bor.autoForwardSpeed;
     }
 
-    // বউ এর অবস্থান নির্ধারণ
     let targetBouX = bou.baseX + Math.sin(score * 0.04) * 40; 
     bou.x = Math.min(canvas.width - bou.width - 20, Math.max(300, targetBouX));
 
-    // বউকে ধরে ফেললে বিজয়ী!
     if (bor.x + bor.width >= bou.x + 10) {
       isGameWon = true;
       playSound(soundWin);
     }
 
-    // বরের গ্র্যাভিটি এবং জাম্প লজিক
     bor.y += bor.vy; bor.vy += bor.gravity;
     if (bor.y >= groundY - bor.height) {
       bor.y = groundY - bor.height;
       bor.jumpCount = 0;
     }
 
-    // বাধার মুভমেন্ট
     obstacle.x -= gameSpeed;
     if (obstacle.x + obstacle.width < 0) {
       const randomType = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
@@ -290,12 +286,10 @@ function update() {
       obstacle.y = (randomType.type === 'pit') ? groundY : groundY - randomType.height;
     }
 
-    // বউ বাধার ওপর দিয়ে লাফ দেবে
     if (obstacle.x - (bou.x + bou.width) < 70 && obstacle.x > bou.x && !bou.isJumping) {
       bou.vy = -13; bou.isJumping = true;
     }
 
-    // বাধা লাগলে গেম ওভার
     let isHit = false;
     if (obstacle.typeData.type === 'pit') {
       if (bor.x + bor.width > obstacle.x && bor.x < obstacle.x + obstacle.width && bor.y + bor.height >= groundY) isHit = true;
@@ -314,6 +308,70 @@ function update() {
 
   bou.y += bou.vy; bou.vy += bou.gravity;
   if (bou.y >= groundY - bou.height) { bou.y = groundY - bou.height; bou.isJumping = false; }
+}
+
+// বাধা অঙ্কনের বিশেষ এইচডি কাস্টম ফাংশন
+function drawEnhancedObstacle(obs) {
+  ctx.save();
+  
+  if (obs.typeData.type === 'pit') {
+    // গর্ত/Pit - রেড নিওন ডেঞ্জার গ্লো
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = "#ff1744";
+    ctx.fillStyle = "#030712";
+    ctx.fillRect(obs.x, obs.y, obs.width, 35);
+    
+    ctx.strokeStyle = "#ff1744";
+    ctx.lineWidth = 4;
+    ctx.strokeRect(obs.x, obs.y, obs.width, 35);
+    
+    // গর্তের ভেতর ওয়ার্নিং স্ট্রাইপ
+    ctx.fillStyle = "#ff1744";
+    for (let i = 0; i < obs.width; i += 15) {
+      ctx.fillRect(obs.x + i, obs.y, 6, 8);
+    }
+  } 
+  else if (obs.typeData.img && obs.typeData.img.complete && obs.typeData.img.naturalWidth !== 0) {
+    // ছবি থাকলে ছবি দিয়ে আউটার গ্লো দেওয়া
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = obs.typeData.type === 'cactus' ? "#00ff66" : "#00d2ff";
+    ctx.drawImage(obs.typeData.img, obs.x, obs.y, obs.width, obs.height);
+  } 
+  else {
+    // ছবি লোড না হলে সুন্দর এইচডি গ্রাফিক্স দিয়ে আঁকা
+    if (obs.typeData.type === 'cactus') {
+      // ক্যাকটাস
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = "#10b981";
+      ctx.fillStyle = "#10b981";
+      ctx.beginPath();
+      ctx.roundRect(obs.x + 18, obs.y, 18, obs.height, 8);
+      ctx.roundRect(obs.x, obs.y + 20, 20, 15, 5);
+      ctx.roundRect(obs.x + 35, obs.y + 30, 20, 15, 5);
+      ctx.fill();
+      ctx.strokeStyle = "#a7f3d0";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    } else {
+      // পাথর (Rock)
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = "#38bdf8";
+      ctx.fillStyle = "#334155";
+      ctx.strokeStyle = "#38bdf8";
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.moveTo(obs.x, obs.y + obs.height);
+      ctx.lineTo(obs.x + 12, obs.y + 10);
+      ctx.lineTo(obs.x + 35, obs.y);
+      ctx.lineTo(obs.x + obs.width, obs.y + 18);
+      ctx.lineTo(obs.x + obs.width - 5, obs.y + obs.height);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
+  }
+  
+  ctx.restore();
 }
 
 function draw() {
@@ -341,28 +399,25 @@ function draw() {
     }
   });
 
+  // রাস্তা/মাটি
   ctx.shadowBlur = 18; ctx.shadowColor = "#38bdf8";
   ctx.strokeStyle = "#38bdf8"; ctx.lineWidth = 5;
   ctx.beginPath(); ctx.moveTo(0, groundY); ctx.lineTo(canvas.width, groundY); ctx.stroke();
   ctx.shadowBlur = 0;
 
+  // পরিষ্কার ও হাইলাইট করা বাধা আঁকা
   if (!isGameWon) {
-    if (obstacle.typeData.type === 'pit') {
-      ctx.fillStyle = "#030712"; ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, 30);
-      ctx.strokeStyle = "#ef4444"; ctx.lineWidth = 3; ctx.strokeRect(obstacle.x, obstacle.y, obstacle.width, 30);
-    } else if (obstacle.typeData.img && obstacle.typeData.img.complete && obstacle.typeData.img.naturalWidth !== 0) {
-      ctx.drawImage(obstacle.typeData.img, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-    } else {
-      ctx.fillStyle = obstacle.typeData.color; ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-    }
+    drawEnhancedObstacle(obstacle);
   }
 
+  // বউ
   if (imgBou.complete && imgBou.naturalWidth !== 0) {
     ctx.drawImage(imgBou, bou.x, bou.y, bou.width, bou.height);
   } else {
     ctx.fillStyle = "#f43f5e"; ctx.fillRect(bou.x, bou.y, bou.width, bou.height);
   }
 
+  // বর
   if (!bor.isDead) {
     if (imgBor.complete && imgBor.naturalWidth !== 0) {
       ctx.drawImage(imgBor, bor.x, bor.y, bor.width, bor.height);
