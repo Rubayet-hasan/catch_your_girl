@@ -383,8 +383,8 @@ function draw() {
 
   let dist = Math.max(0, Math.floor((bou.x - bor.x) / 10));
   ctx.font = "bold 17px 'Hind Siliguri'";
-  ctx.fillStyle = "#ff4d6d"; ctx.fillText(`বউয়ের দূরত্ব: ${dist}m 🏃‍♀️`, 25, 36);
-  ctx.fillStyle = "#ffb703"; ctx.fillText(`সর্বোচ্চ স্কোর: ${highScore}`, 25, 60);
+  ctx.fillStyle = "#ff4d6d"; ctx.fillText(`Tasfia's distance: ${dist}m 🏃‍♀️`, 25, 36);
+  ctx.fillStyle = "#ffb703"; ctx.fillText(`High score: ${highScore}`, 25, 60);
 
   // GAME OVER স্ক্রিন
   if (bor.isDead) {
@@ -396,7 +396,7 @@ function draw() {
     ctx.fillStyle = "#fbbf24"; ctx.font = "bold 22px 'Hind Siliguri'";
     ctx.fillText("ধুর! SAYIM আটকে গেল! 💔", 900 / 2, 220);
     ctx.fillStyle = "#9ca3af"; ctx.font = "bold 16px 'Hind Siliguri'";
-    ctx.fillText("আবার খেলতে স্ক্রিনে টাচ করুন 🔄", 900 / 2, 265);
+    ctx.fillText("Tap to try again 🔄", 900 / 2, 265);
     ctx.textAlign = "left";
   }
 
@@ -410,7 +410,7 @@ function draw() {
     ctx.fillStyle = "#38bdf8"; ctx.font = "bold 22px 'Hind Siliguri'";
     ctx.fillText("অভিনন্দন! আপনি TASFIA কে ধরে ফেলেছেন! ❤️", 900 / 2, 220);
     ctx.fillStyle = "#9ca3af"; ctx.font = "bold 16px 'Hind Siliguri'";
-    ctx.fillText("আবার খেলতে স্ক্রিনে টাচ করুন 🔄", 900 / 2, 265);
+    ctx.fillText("Tap to play again 🔄", 900 / 2, 265);
     ctx.textAlign = "left";
   }
 }
