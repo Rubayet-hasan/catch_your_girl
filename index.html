@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Catch Your Girl - Smooth Edition</title>
+  <title>Catch Your Girl - Neon Edition</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Hind+Siliguri:wght@600;700;800&display=swap');
     
@@ -116,9 +116,6 @@ const imgBor = new Image(); imgBor.src = 'bor.jpg';
 const imgGameOver = new Image(); imgGameOver.src = 'gameover.jpg'; 
 const imgWin = new Image(); imgWin.src = 'win.jpg'; 
 
-const imgCactus = new Image(); imgCactus.src = 'https://cdn-icons-png.flaticon.com/512/3532/3532731.png';
-const imgRock = new Image(); imgRock.src = 'https://cdn-icons-png.flaticon.com/512/2909/2909772.png';
-
 const soundWin = new Audio('win.mp3');
 const soundLose = new Audio('lose.mp3');
 let isMuted = false;
@@ -149,7 +146,7 @@ let cityBuildings = Array.from({length: 12}, (_, i) => ({
   color: `rgba(${Math.floor(Math.random()*30 + 15)}, ${Math.floor(Math.random()*40 + 20)}, ${Math.floor(Math.random()*70 + 40)}, 0.85)`
 }));
 
-// ক্যারেক্টার সেটআপ (বউকে কাছে ও ধরা সহজ করা হয়েছে)
+// ক্যারেক্টার সেটআপ
 let bor = { 
   x: 80, y: groundY - 80, width: 65, height: 80, 
   autoForwardSpeed: 0.5, 
@@ -163,14 +160,14 @@ let bou = {
   speed: 1.2, vy: 0, gravity: 0.65, isJumping: false 
 };
 
-// বাধার তালিকা
+// সম্পূর্ণ নতুন ৩ ধরনের ফিউচারিস্টিক হাই-টেক বাধা
 const obstacleTypes = [
-  { type: 'cactus', width: 55, height: 75, img: imgCactus },
-  { type: 'rock', width: 65, height: 50, img: imgRock },
-  { type: 'pit', width: 75, height: 25, img: null }
+  { type: 'laser', width: 40, height: 75, color: '#ff0055' },
+  { type: 'spike', width: 60, height: 55, color: '#00f0ff' },
+  { type: 'portal', width: 70, height: 30, color: '#facc15' }
 ];
 
-let obstacle = { x: 900, y: groundY - 75, width: 55, height: 75, typeData: obstacleTypes[0] };
+let obstacle = { x: 900, y: groundY - 75, width: 40, height: 75, typeData: obstacleTypes[0] };
 
 function handleTapAction() {
   if (isGameOver || isGameWon) {
@@ -209,7 +206,6 @@ function update() {
     if (score > highScore) highScore = score;
     gameSpeed = baseSpeed + Math.floor(score / 450) * 0.3;
 
-    // বর আস্তে আস্তে সামনে আগাবে
     if (bor.x < bou.x - 30) {
       bor.x += bor.autoForwardSpeed;
     }
@@ -217,7 +213,6 @@ function update() {
     let targetBouX = bou.baseX + Math.sin(score * 0.04) * 35; 
     bou.x = Math.min(canvas.width - bou.width - 20, Math.max(280, targetBouX));
 
-    // বউকে ধরে ফেললে বিজয়ী!
     if (bor.x + bor.width >= bou.x + 10) {
       isGameWon = true;
       playSound(soundWin);
@@ -236,7 +231,7 @@ function update() {
       obstacle.width = randomType.width;
       obstacle.height = randomType.height;
       obstacle.x = canvas.width + Math.random() * 250;
-      obstacle.y = (randomType.type === 'pit') ? groundY : groundY - randomType.height;
+      obstacle.y = (randomType.type === 'portal') ? groundY - 5 : groundY - randomType.height;
     }
 
     if (obstacle.x - (bou.x + bou.width) < 70 && obstacle.x > bou.x && !bou.isJumping) {
@@ -244,8 +239,8 @@ function update() {
     }
 
     let isHit = false;
-    if (obstacle.typeData.type === 'pit') {
-      if (bor.x + bor.width > obstacle.x && bor.x < obstacle.x + obstacle.width && bor.y + bor.height >= groundY) isHit = true;
+    if (obstacle.typeData.type === 'portal') {
+      if (bor.x + bor.width > obstacle.x && bor.x < obstacle.x + obstacle.width && bor.y + bor.height >= groundY - 5) isHit = true;
     } else {
       if (bor.x < obstacle.x + obstacle.width - 5 && bor.x + bor.width - 5 > obstacle.x && bor.y < obstacle.y + obstacle.height && bor.y + bor.height > obstacle.y) isHit = true;
     }
@@ -263,61 +258,64 @@ function update() {
   if (bou.y >= groundY - bou.height) { bou.y = groundY - bou.height; bou.isJumping = false; }
 }
 
-// বাধার জন্য বিশেষ ডিজাইন আঁকা
-function drawEnhancedObstacle(obs) {
+// একদম নতুন ও গ্লোয়িং নিওন বাধা ড্র করার লজিক
+function drawUniqueObstacle(obs) {
   ctx.save();
   
-  if (obs.typeData.type === 'pit') {
-    ctx.shadowBlur = 15;
-    ctx.shadowColor = "#ff1744";
-    ctx.fillStyle = "#030712";
-    ctx.fillRect(obs.x, obs.y, obs.width, 35);
+  if (obs.typeData.type === 'laser') {
+    // টাইপ ১: লেজার বেরিয়ার (Red/Pink Neon Beam)
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = "#ff0055";
     
-    ctx.strokeStyle = "#ff1744";
-    ctx.lineWidth = 4;
-    ctx.strokeRect(obs.x, obs.y, obs.width, 35);
+    // নিচের ও ওপরের পোল
+    ctx.fillStyle = "#1e293b";
+    ctx.fillRect(obs.x + 10, obs.y, 20, 15);
+    ctx.fillRect(obs.x + 10, obs.y + obs.height - 15, 20, 15);
     
-    ctx.fillStyle = "#ff1744";
-    for (let i = 0; i < obs.width; i += 15) {
-      ctx.fillRect(obs.x + i, obs.y, 6, 8);
-    }
+    // মাঝের লেজার বিম
+    let beamGrad = ctx.createLinearGradient(obs.x, 0, obs.x + obs.width, 0);
+    beamGrad.addColorStop(0, "rgba(255,0,85,0.3)");
+    beamGrad.addColorStop(0.5, "#ffffff");
+    beamGrad.addColorStop(1, "rgba(255,0,85,0.3)");
+    
+    ctx.fillStyle = beamGrad;
+    ctx.fillRect(obs.x + 14, obs.y + 12, 12, obs.height - 24);
   } 
-  else if (obs.typeData.img && obs.typeData.img.complete && obs.typeData.img.naturalWidth !== 0) {
-    ctx.shadowBlur = 15;
-    ctx.shadowColor = obs.typeData.type === 'cactus' ? "#00ff66" : "#00d2ff";
-    ctx.drawImage(obs.typeData.img, obs.x, obs.y, obs.width, obs.height);
-  } 
-  else {
-    if (obs.typeData.type === 'cactus') {
-      ctx.shadowBlur = 20;
-      ctx.shadowColor = "#10b981";
-      ctx.fillStyle = "#10b981";
+  else if (obs.typeData.type === 'spike') {
+    // টাইপ ২: সাইবার ক্রিস্টাল স্পাইক (Cyan/Neon Blue Spikes)
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = "#00f0ff";
+    ctx.fillStyle = "#00f0ff";
+    
+    let count = 3;
+    let w = obs.width / count;
+    for(let i = 0; i < count; i++) {
       ctx.beginPath();
-      ctx.roundRect(obs.x + 18, obs.y, 18, obs.height, 8);
-      ctx.roundRect(obs.x, obs.y + 20, 20, 15, 5);
-      ctx.roundRect(obs.x + 35, obs.y + 30, 20, 15, 5);
-      ctx.fill();
-      ctx.strokeStyle = "#a7f3d0";
-      ctx.lineWidth = 3;
-      ctx.stroke();
-    } else {
-      ctx.shadowBlur = 20;
-      ctx.shadowColor = "#38bdf8";
-      ctx.fillStyle = "#334155";
-      ctx.strokeStyle = "#38bdf8";
-      ctx.lineWidth = 3.5;
-      ctx.beginPath();
-      ctx.moveTo(obs.x, obs.y + obs.height);
-      ctx.lineTo(obs.x + 12, obs.y + 10);
-      ctx.lineTo(obs.x + 35, obs.y);
-      ctx.lineTo(obs.x + obs.width, obs.y + 18);
-      ctx.lineTo(obs.x + obs.width - 5, obs.y + obs.height);
+      ctx.moveTo(obs.x + i * w, obs.y + obs.height);
+      ctx.lineTo(obs.x + i * w + w / 2, obs.y);
+      ctx.lineTo(obs.x + (i + 1) * w, obs.y + obs.height);
       ctx.closePath();
       ctx.fill();
-      ctx.stroke();
     }
+  } 
+  else if (obs.typeData.type === 'portal') {
+    // টাইপ ৩: এনার্জি ট্র্যাপ/পোর্টাল (Yellow/Gold Energy Line)
+    ctx.shadowBlur = 25;
+    ctx.shadowColor = "#facc15";
+    
+    ctx.fillStyle = "rgba(250, 204, 21, 0.25)";
+    ctx.fillRect(obs.x, obs.y, obs.width, 20);
+    
+    ctx.strokeStyle = "#facc15";
+    ctx.lineWidth = 4;
+    ctx.strokeRect(obs.x, obs.y, obs.width, 20);
+    
+    // পালসিং এনার্জি লাইন
+    ctx.fillStyle = "#ffffff";
+    let pX = obs.x + (score * 8) % obs.width;
+    ctx.fillRect(pX, obs.y, 10, 20);
   }
-  
+
   ctx.restore();
 }
 
@@ -353,7 +351,7 @@ function draw() {
   ctx.shadowBlur = 0;
 
   if (!isGameWon) {
-    drawEnhancedObstacle(obstacle);
+    drawUniqueObstacle(obstacle);
   }
 
   // বউ
