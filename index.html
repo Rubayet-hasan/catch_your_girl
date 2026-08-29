@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Catch Your Girl</title>
+  <title>Catch Your Girl - Ultra Edition</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Hind+Siliguri:wght@500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Hind+Siliguri:wght@600;700;800&display=swap');
     
     * { 
       margin: 0; 
@@ -15,8 +15,9 @@
       -webkit-user-select: none;
       -webkit-touch-callout: none;
     }
+
     body {
-      background: #090d16;
+      background: #030712;
       color: #fff;
       display: flex;
       flex-direction: column;
@@ -27,100 +28,116 @@
       font-family: 'Hind Siliguri', sans-serif;
       touch-action: manipulation;
     }
+
+    /* গেম এরিয়া স্ক্রিনের পুরো জায়গা জুড়ে থাকবে */
     .game-container {
       position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
-      background: rgba(15, 23, 42, 0.95);
-      padding: 10px;
-      border-radius: 20px;
-      border: 2px solid rgba(56, 189, 248, 0.3);
+      justify-content: space-between;
+      background: rgba(15, 23, 42, 0.98);
+      padding: 12px;
+      border-radius: 24px;
+      border: 3px solid rgba(56, 189, 248, 0.4);
       width: 100vw;
       height: 100vh;
-      max-width: none;
-      max-height: none;
-      box-shadow: none;
-      justify-content: space-between;
+      max-width: 1000px;
+      max-height: 600px;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(56, 189, 248, 0.15);
     }
+
     canvas {
-      border: 2px solid #38bdf8;
-      box-shadow: 0 0 25px rgba(56, 189, 248, 0.3);
-      background: #070a12;
+      border: 3px solid #38bdf8;
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.35);
+      background: #050811;
       width: 100%;
-      height: 100%;
-      max-height: 64vh;
-      object-fit: contain;
-      border-radius: 14px;
+      flex-grow: 1;
+      border-radius: 18px;
       touch-action: none;
     }
+
+    /* টপ বার কাস্টমাইজেশন (বটম লেআউট আরও স্পষ্ট করার জন্য) */
     .top-bar {
       width: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 4px;
-      padding: 0 4px;
+      margin-bottom: 8px;
+      padding: 0 6px;
     }
-    .diff-selector { display: flex; gap: 10px; }
+
+    .diff-selector { display: flex; gap: 8px; }
+
     .diff-btn {
-      padding: 12px 22px;
-      border: 1px solid rgba(56, 189, 248, 0.4);
+      padding: 8px 16px;
+      border: 2px solid rgba(56, 189, 248, 0.4);
       background: #0f172a;
       color: #9ca3af;
       font-family: 'Orbitron', sans-serif;
-      font-size: 15px;
+      font-size: 13px;
       font-weight: 800;
-      border-radius: 12px;
+      border-radius: 10px;
       cursor: pointer;
       transition: all 0.2s ease;
     }
+
     .diff-btn.active {
       background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
       color: #030712;
-      box-shadow: 0 0 18px rgba(56, 189, 248, 0.6);
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.8);
       border-color: #7dd3fc;
     }
+
     .audio-btn {
       background: #0f172a;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.2);
       color: #fff;
-      padding: 12px 22px;
-      border-radius: 12px;
-      font-size: 15px;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 14px;
       font-weight: bold;
       cursor: pointer;
     }
+
+    /* ফোনের জন্য বড় ও চমৎকার টাচ কন্ট্রোল বাটন */
     .controls {
       display: flex;
-      gap: 15px;
-      margin-top: 4px;
-      margin-bottom: env(safe-area-inset-bottom, 15px);
+      gap: 16px;
+      margin-top: 10px;
       width: 100%;
       justify-content: center;
     }
+
     .btn {
       flex: 1;
-      max-width: none;
-      height: 85px;
+      height: 70px; /* বাটনের উচ্চতা বাড়ানো হয়েছে */
       background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
       border: none;
       border-radius: 18px;
-      font-size: 22px;
-      font-weight: bold;
+      font-size: 20px;
+      font-weight: 800;
       color: #fff;
       touch-action: manipulation;
-      box-shadow: 0 7px 0 #075985, 0 12px 22px rgba(0,0,0,0.4);
+      box-shadow: 0 6px 0 #075985, 0 10px 20px rgba(0,0,0,0.5);
       cursor: pointer;
-      transition: background 0.1s;
+      transition: transform 0.05s, box-shadow 0.05s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+
     .btn-jump {
-      flex: 1.3;
-      max-width: none;
+      flex: 1.4;
       background: linear-gradient(180deg, #f43f5e 0%, #be123c 100%);
-      box-shadow: 0 7px 0 #9f1239, 0 12px 22px rgba(244, 63, 94, 0.3);
+      box-shadow: 0 6px 0 #9f1239, 0 10px 20px rgba(244, 63, 94, 0.4);
+      font-size: 22px;
     }
-    .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 transparent; }
+
+    .btn:active { 
+      transform: translateY(4px); 
+      box-shadow: 0 2px 0 transparent, 0 4px 10px rgba(0,0,0,0.3); 
+    }
   </style>
 </head>
 <body>
@@ -135,10 +152,10 @@
     <button class="audio-btn" id="audioToggle" onclick="toggleAudio()">🔊 Sound: ON</button>
   </div>
 
-  <canvas id="gameCanvas" width="850" height="420"></canvas>
+  <canvas id="gameCanvas" width="900" height="420"></canvas>
 
   <div class="controls">
-    <button class="btn" id="btnLeft">◀ BACK</button>
+    <button class="btn" id="btnLeft">◀ PUSH BACK</button>
     <button class="btn btn-jump" id="btnJump">🦘 JUMP</button>
     <button class="btn" id="btnRight">FORWARD ▶</button>
   </div>
@@ -172,41 +189,41 @@ function playSound(sound) {
   }
 }
 
-let groundY = 315;
+let groundY = 340;
 let isGameOver = false, isGameWon = false;
 let score = 0, highScore = 0;
 let baseSpeed = 5, gameSpeed = 5;
 let currentDifficulty = 'easy';
 
 // ব্যাকগ্রাউন্ডের তারা ও নিওন বিল্ডিং
-let stars = Array.from({length: 45}, () => ({x: Math.random()*850, y: Math.random()*190, speed: Math.random()*0.4 + 0.1, size: Math.random()*2 + 1}));
+let stars = Array.from({length: 50}, () => ({x: Math.random()*900, y: Math.random()*190, speed: Math.random()*0.5 + 0.1, size: Math.random()*2.5 + 1}));
 let cityBuildings = Array.from({length: 12}, (_, i) => ({
-  x: i * 80, 
-  width: 65, 
-  height: 65 + Math.random()*105,
-  color: `rgba(${Math.floor(Math.random()*30 + 15)}, ${Math.floor(Math.random()*40 + 20)}, ${Math.floor(Math.random()*60 + 40)}, 0.8)`
+  x: i * 85, 
+  width: 70, 
+  height: 60 + Math.random()*100,
+  color: `rgba(${Math.floor(Math.random()*30 + 15)}, ${Math.floor(Math.random()*40 + 20)}, ${Math.floor(Math.random()*70 + 40)}, 0.85)`
 }));
 
-// বর ও বউ অবজেক্ট (আরও অনেক বড় সাইজ)
+// বর ও বউ সাইজ বড় করা হয়েছে (Large Characters)
 let bor = { 
-  x: 80, y: groundY - 110, width: 95, height: 110, 
+  x: 80, y: groundY - 80, width: 65, height: 80, 
   speed: 8.5, vy: 0, gravity: 0.65, 
   jumpCount: 0, maxJumps: 2, isDead: false 
 };
 
 let bou = { 
-  x: 600, y: groundY - 110, width: 95, height: 110, 
-  baseX: 600,
+  x: 650, y: groundY - 80, width: 65, height: 80, 
+  baseX: 650,
   speed: 1.5, vy: 0, gravity: 0.65, isJumping: false 
 };
 
 const obstacleTypes = [
-  { type: 'cactus', width: 80, height: 95, img: imgCactus, color: '#22c55e' },
-  { type: 'rock', width: 85, height: 68, img: imgRock, color: '#64748b' },
-  { type: 'pit', width: 90, height: 20, img: null, color: '#0f172a' }
+  { type: 'cactus', width: 50, height: 65, img: imgCactus, color: '#22c55e' },
+  { type: 'rock', width: 55, height: 45, img: imgRock, color: '#64748b' },
+  { type: 'pit', width: 60, height: 20, img: null, color: '#0f172a' }
 ];
 
-let obstacle = { x: 850, y: groundY - 95, width: 80, height: 95, typeData: obstacleTypes[0] };
+let obstacle = { x: 900, y: groundY - 65, width: 50, height: 65, typeData: obstacleTypes[0] };
 let moveLeft = false, moveRight = false;
 
 function setDifficulty(level, e) {
@@ -216,25 +233,25 @@ function setDifficulty(level, e) {
 
   if (level === 'easy') {
     baseSpeed = 5;
-    bou.baseX = 520; 
+    bou.baseX = 580;
   } else if (level === 'medium') {
     baseSpeed = 7;
-    bou.baseX = 610; 
+    bou.baseX = 670;
   } else if (level === 'hard') {
     baseSpeed = 9;
-    bou.baseX = 690; 
+    bou.baseX = 760;
   }
   restartGame();
 }
 
 function makeBorJump() {
   if (bor.jumpCount < bor.maxJumps && !bor.isDead && !isGameWon) {
-    bor.vy = -14;
+    bor.vy = -13.5;
     bor.jumpCount++;
   }
 }
 
-// মোবাইল টাচ ইভেন্ট লজিক
+// টাচপ্রুফ মোবাইল ইভেন্ট
 const bindTouch = (elem, startFn, endFn) => {
   elem.addEventListener("touchstart", (e) => { e.preventDefault(); startFn(); }, { passive: false });
   elem.addEventListener("touchend", (e) => { e.preventDefault(); if(endFn) endFn(); }, { passive: false });
@@ -268,49 +285,42 @@ function update() {
     if (score > highScore) highScore = score;
     gameSpeed = baseSpeed + Math.floor(score / 350) * 0.5;
 
-    // বরের মুভমেন্ট
     if (moveLeft && bor.x > 0) bor.x -= bor.speed;
     if (moveRight) bor.x += bor.speed;
 
-    // বউ স্ক্রিন থেকে বের হবে না! নির্দিষ্ট সীমায় আটকে থাকবে
-    let targetBouX = bou.baseX + Math.sin(score * 0.05) * 40; 
+    let targetBouX = bou.baseX + Math.sin(score * 0.05) * 45; 
     bou.x = Math.min(canvas.width - bou.width - 15, Math.max(300, targetBouX));
 
-    // বর বউকে ধরে ফেললে (WIN CONDITION)
-    if (bor.x + bor.width >= bou.x + 15) {
+    if (bor.x + bor.width >= bou.x + 10) {
       isGameWon = true;
       playSound(soundWin);
     }
 
-    // বরের ফিজিক্স
     bor.y += bor.vy; bor.vy += bor.gravity;
     if (bor.y >= groundY - bor.height) {
       bor.y = groundY - bor.height;
       bor.jumpCount = 0;
     }
 
-    // বাধা (Obstacle) মুভমেন্ট
     obstacle.x -= gameSpeed;
     if (obstacle.x + obstacle.width < 0) {
       const randomType = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
       obstacle.typeData = randomType;
       obstacle.width = randomType.width;
       obstacle.height = randomType.height;
-      obstacle.x = canvas.width + Math.random() * 250;
+      obstacle.x = canvas.width + Math.random() * 200;
       obstacle.y = (randomType.type === 'pit') ? groundY : groundY - randomType.height;
     }
 
-    // বউয়ের অটোজাম্প AI
-    if (obstacle.x - (bou.x + bou.width) < 90 && obstacle.x > bou.x && !bou.isJumping) {
-      bou.vy = -14.5; bou.isJumping = true;
+    if (obstacle.x - (bou.x + bou.width) < 70 && obstacle.x > bou.x && !bou.isJumping) {
+      bou.vy = -13; bou.isJumping = true;
     }
 
-    // বর বাধার সাথে ধাক্কা খেলে (GAME OVER)
     let isHit = false;
     if (obstacle.typeData.type === 'pit') {
-      if (bor.x + bor.width - 15 > obstacle.x && bor.x + 15 < obstacle.x + obstacle.width && bor.y + bor.height >= groundY) isHit = true;
+      if (bor.x + bor.width > obstacle.x && bor.x < obstacle.x + obstacle.width && bor.y + bor.height >= groundY) isHit = true;
     } else {
-      if (bor.x + 12 < obstacle.x + obstacle.width - 12 && bor.x + bor.width - 12 > obstacle.x + 12 && bor.y + 12 < obstacle.y + obstacle.height && bor.y + bor.height > obstacle.y + 12) isHit = true;
+      if (bor.x < obstacle.x + obstacle.width - 5 && bor.x + bor.width - 5 > obstacle.x && bor.y < obstacle.y + obstacle.height && bor.y + bor.height > obstacle.y) isHit = true;
     }
 
     if (isHit) {
@@ -319,10 +329,9 @@ function update() {
       playSound(soundLose);
     }
   } else if (bor.isDead) {
-    if (bou.x < canvas.width + 100) bou.x += 6; 
+    if (bou.x < canvas.width + 100) bou.x += 6;
   }
 
-  // বউয়ের ফিজিক্স
   bou.y += bou.vy; bou.vy += bou.gravity;
   if (bou.y >= groundY - bou.height) { bou.y = groundY - bou.height; bou.isJumping = false; }
 }
@@ -330,42 +339,37 @@ function update() {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // ব্যাকগ্রাউন্ড গ্র্যাডিয়েন্ট
   let bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  bgGradient.addColorStop(0, "#070a14");
-  bgGradient.addColorStop(0.7, "#0d1527");
-  bgGradient.addColorStop(1, "#172554");
+  bgGradient.addColorStop(0, "#050714");
+  bgGradient.addColorStop(0.7, "#0d182e");
+  bgGradient.addColorStop(1, "#1e293b");
   ctx.fillStyle = bgGradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // তারা
   stars.forEach(s => {
     ctx.fillStyle = `rgba(255, 255, 255, ${Math.random()*0.5 + 0.5})`;
     ctx.fillRect(s.x, s.y, s.size, s.size);
   });
 
-  // নিওন বিল্ডিং
   cityBuildings.forEach(b => {
     ctx.fillStyle = b.color;
     ctx.fillRect(b.x, groundY - b.height, b.width, b.height);
-    ctx.fillStyle = "rgba(253, 224, 71, 0.3)";
-    for(let wy = groundY - b.height + 12; wy < groundY - 12; wy += 22) {
-      ctx.fillRect(b.x + 12, wy, 10, 12);
-      ctx.fillRect(b.x + b.width - 22, wy, 10, 12);
+    ctx.fillStyle = "rgba(253, 224, 71, 0.35)";
+    for(let wy = groundY - b.height + 10; wy < groundY - 10; wy += 22) {
+      ctx.fillRect(b.x + 10, wy, 10, 12);
+      ctx.fillRect(b.x + b.width - 20, wy, 10, 12);
     }
   });
 
-  // মাটি (Ground Line)
-  ctx.shadowBlur = 15; ctx.shadowColor = "#38bdf8";
-  ctx.strokeStyle = "#38bdf8"; ctx.lineWidth = 4;
+  ctx.shadowBlur = 18; ctx.shadowColor = "#38bdf8";
+  ctx.strokeStyle = "#38bdf8"; ctx.lineWidth = 5;
   ctx.beginPath(); ctx.moveTo(0, groundY); ctx.lineTo(canvas.width, groundY); ctx.stroke();
   ctx.shadowBlur = 0;
 
-  // বাধা (Obstacle)
   if (!isGameWon) {
     if (obstacle.typeData.type === 'pit') {
-      ctx.fillStyle = "#030712"; ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, 35);
-      ctx.strokeStyle = "#ef4444"; ctx.lineWidth = 2; ctx.strokeRect(obstacle.x, obstacle.y, obstacle.width, 35);
+      ctx.fillStyle = "#030712"; ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, 30);
+      ctx.strokeStyle = "#ef4444"; ctx.lineWidth = 3; ctx.strokeRect(obstacle.x, obstacle.y, obstacle.width, 30);
     } else if (obstacle.typeData.img && obstacle.typeData.img.complete && obstacle.typeData.img.naturalWidth !== 0) {
       ctx.drawImage(obstacle.typeData.img, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
     } else {
@@ -373,14 +377,12 @@ function draw() {
     }
   }
 
-  // বউ
   if (imgBou.complete && imgBou.naturalWidth !== 0) {
     ctx.drawImage(imgBou, bou.x, bou.y, bou.width, bou.height);
   } else {
     ctx.fillStyle = "#f43f5e"; ctx.fillRect(bou.x, bou.y, bou.width, bou.height);
   }
 
-  // বর
   if (!bor.isDead) {
     if (imgBor.complete && imgBor.naturalWidth !== 0) {
       ctx.drawImage(imgBor, bor.x, bor.y, bor.width, bor.height);
@@ -389,31 +391,32 @@ function draw() {
     }
   }
 
-  // HUD ড্যাশবোর্ড (আরও বড় সাইজ)
+  // HUD ড্যাশবোর্ড (বড় ও রেসপন্সিভ টেক্সট)
   ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
   ctx.strokeStyle = "rgba(56, 189, 248, 0.5)";
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.roundRect(15, 12, 300, 88, 14);
+  ctx.roundRect(15, 12, 280, 80, 12);
   ctx.fill(); ctx.stroke();
 
-  ctx.font = "bold 16px Orbitron"; ctx.fillStyle = "#38bdf8";
-  ctx.fillText(`MODE: ${currentDifficulty.toUpperCase()}`, 28, 38);
+  ctx.font = "bold 14px Orbitron"; ctx.fillStyle = "#38bdf8";
+  ctx.fillText(`MODE: ${currentDifficulty.toUpperCase()}`, 25, 35);
   let dist = Math.max(0, Math.floor((bou.x - bor.x) / 10));
-  ctx.fillStyle = "#f43f5e"; ctx.fillText(`BOU DISTANCE: ${dist}m 🏃‍♀️`, 28, 62);
-  ctx.fillStyle = "#fbbf24"; ctx.fillText(`HIGH SCORE: ${highScore}`, 28, 86);
+  ctx.font = "bold 16px 'Hind Siliguri'";
+  ctx.fillStyle = "#f43f5e"; ctx.fillText(`বউয়ের দূরত্ব: ${dist}m 🏃‍♀️`, 25, 58);
+  ctx.fillStyle = "#fbbf24"; ctx.fillText(`সর্বোচ্চ স্কোর: ${highScore}`, 25, 80);
 
   // GAME OVER স্ক্রিন
   if (bor.isDead) {
     ctx.fillStyle = "rgba(3, 7, 18, 0.94)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    if (imgGameOver.complete && imgGameOver.naturalWidth !== 0) ctx.drawImage(imgGameOver, canvas.width/2 - 65, 25, 130, 130);
-    ctx.textAlign = "center"; ctx.fillStyle = "#ef4444"; ctx.font = "900 42px Orbitron";
-    ctx.fillText("GAME OVER", canvas.width / 2, 180);
+    if (imgGameOver.complete && imgGameOver.naturalWidth !== 0) ctx.drawImage(imgGameOver, canvas.width/2 - 55, 30, 110, 110);
+    ctx.textAlign = "center"; ctx.fillStyle = "#ef4444"; ctx.font = "900 38px Orbitron";
+    ctx.fillText("GAME OVER", canvas.width / 2, 175);
     ctx.fillStyle = "#fbbf24"; ctx.font = "bold 22px 'Hind Siliguri'";
-    ctx.fillText("ধুর! SAYIM আটকে গেল! 💔", canvas.width / 2, 225);
-    ctx.fillStyle = "#9ca3af"; ctx.font = "18px 'Hind Siliguri'";
-    ctx.fillText("TAP SCREEN TO TRY AGAIN 🔄", canvas.width / 2, 275);
+    ctx.fillText("ধুর! SAYIM আটকে গেল! 💔", canvas.width / 2, 220);
+    ctx.fillStyle = "#9ca3af"; ctx.font = "bold 16px 'Hind Siliguri'";
+    ctx.fillText("আবার খেলতে স্ক্রিনে টাচ করুন 🔄", canvas.width / 2, 265);
     ctx.textAlign = "left";
   }
 
@@ -421,48 +424,8 @@ function draw() {
   if (isGameWon) {
     ctx.fillStyle = "rgba(3, 7, 18, 0.94)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    if (imgWin.complete && imgWin.naturalWidth !== 0) ctx.drawImage(imgWin, canvas.width/2 - 70, 25, 140, 140);
-    ctx.textAlign = "center"; ctx.fillStyle = "#4ade80"; ctx.font = "900 44px Orbitron";
-    ctx.fillText("VICTORY!! 💍🎉", canvas.width / 2, 185);
+    if (imgWin.complete && imgWin.naturalWidth !== 0) ctx.drawImage(imgWin, canvas.width/2 - 60, 25, 120, 120);
+    ctx.textAlign = "center"; ctx.fillStyle = "#4ade80"; ctx.font = "900 40px Orbitron";
+    ctx.fillText("VICTORY!! 💍🎉", canvas.width / 2, 175);
     ctx.fillStyle = "#38bdf8"; ctx.font = "bold 22px 'Hind Siliguri'";
-    ctx.fillText(`অভিনন্দন! আপনি ${currentDifficulty.toUpperCase()} TASFIA কে ধরে ফেলেছেন! ❤️`, canvas.width / 2, 230);
-    ctx.fillStyle = "#9ca3af"; ctx.font = "18px 'Hind Siliguri'";
-    ctx.fillText("TAP SCREEN TO TRY AGAIN 🔄", canvas.width / 2, 280);
-    ctx.textAlign = "left";
-  }
-}
-
-function gameLoop() {
-  update();
-  draw();
-  requestAnimationFrame(gameLoop);
-}
-
-function restartGame() {
-  soundWin.pause(); soundWin.currentTime = 0;
-  soundLose.pause(); soundLose.currentTime = 0;
-  isGameOver = false; isGameWon = false; bor.isDead = false;
-  score = 0; gameSpeed = baseSpeed;
-  bor.x = 80; bor.y = groundY - bor.height; bor.jumpCount = 0;
-  
-  if (currentDifficulty === 'easy') bou.baseX = 520;
-  else if (currentDifficulty === 'medium') bou.baseX = 610;
-  else if (currentDifficulty === 'hard') bou.baseX = 690;
-  
-  bou.x = bou.baseX;
-  obstacle.x = 850;
-}
-
-canvas.addEventListener("touchstart", (e) => { 
-  e.preventDefault(); 
-  if (isGameOver || isGameWon) restartGame(); 
-}, { passive: false });
-
-canvas.addEventListener("click", () => { 
-  if (isGameOver || isGameWon) restartGame(); 
-});
-
-gameLoop();
-</script>
-</body>
-</html>
+    ctx.fillText(`অভিনন্দন! আপনি ${currentDifficulty.toUpperCase()} TASFIA কে ধরে ফেলেছেন! ❤️`, canvas.width /
