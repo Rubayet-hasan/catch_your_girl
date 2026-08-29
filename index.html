@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Catch Your Girl - Ultra Edition</title>
+  <title>Catch Your Girl - Touch & Play</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Hind+Siliguri:wght@600;700;800&display=swap');
     
@@ -17,7 +17,7 @@
     }
 
     body {
-      background: #030712;
+      background: #020617;
       color: #fff;
       display: flex;
       flex-direction: column;
@@ -29,7 +29,6 @@
       touch-action: manipulation;
     }
 
-    /* গেম এরিয়া স্ক্রিনের পুরো জায়গা জুড়ে থাকবে */
     .game-container {
       position: relative;
       display: flex;
@@ -37,13 +36,13 @@
       align-items: center;
       justify-content: space-between;
       background: rgba(15, 23, 42, 0.98);
-      padding: 12px;
-      border-radius: 24px;
+      padding: 10px;
+      border-radius: 20px;
       border: 3px solid rgba(56, 189, 248, 0.4);
       width: 100vw;
       height: 100vh;
       max-width: 1000px;
-      max-height: 600px;
+      max-height: 650px;
       box-shadow: 0 0 40px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(56, 189, 248, 0.15);
     }
 
@@ -52,19 +51,20 @@
       box-shadow: 0 0 30px rgba(56, 189, 248, 0.35);
       background: #050811;
       width: 100%;
+      height: 100%;
       flex-grow: 1;
-      border-radius: 18px;
+      border-radius: 16px;
       touch-action: none;
+      cursor: pointer;
     }
 
-    /* টপ বার কাস্টমাইজেশন (বটম লেআউট আরও স্পষ্ট করার জন্য) */
     .top-bar {
       width: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 8px;
-      padding: 0 6px;
+      padding: 0 4px;
     }
 
     .diff-selector { display: flex; gap: 8px; }
@@ -100,43 +100,20 @@
       cursor: pointer;
     }
 
-    /* ফোনের জন্য বড় ও চমৎকার টাচ কন্ট্রোল বাটন */
-    .controls {
-      display: flex;
-      gap: 16px;
-      margin-top: 10px;
-      width: 100%;
-      justify-content: center;
+    .tap-hint {
+      position: absolute;
+      bottom: 25px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      pointer-events: none;
+      animation: pulse 1.5s infinite;
     }
 
-    .btn {
-      flex: 1;
-      height: 70px; /* বাটনের উচ্চতা বাড়ানো হয়েছে */
-      background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
-      border: none;
-      border-radius: 18px;
-      font-size: 20px;
-      font-weight: 800;
-      color: #fff;
-      touch-action: manipulation;
-      box-shadow: 0 6px 0 #075985, 0 10px 20px rgba(0,0,0,0.5);
-      cursor: pointer;
-      transition: transform 0.05s, box-shadow 0.05s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .btn-jump {
-      flex: 1.4;
-      background: linear-gradient(180deg, #f43f5e 0%, #be123c 100%);
-      box-shadow: 0 6px 0 #9f1239, 0 10px 20px rgba(244, 63, 94, 0.4);
-      font-size: 22px;
-    }
-
-    .btn:active { 
-      transform: translateY(4px); 
-      box-shadow: 0 2px 0 transparent, 0 4px 10px rgba(0,0,0,0.3); 
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; transform: scale(0.98); }
+      50% { opacity: 1; transform: scale(1.02); }
     }
   </style>
 </head>
@@ -153,12 +130,7 @@
   </div>
 
   <canvas id="gameCanvas" width="900" height="420"></canvas>
-
-  <div class="controls">
-    <button class="btn" id="btnLeft">◀ PUSH BACK</button>
-    <button class="btn btn-jump" id="btnJump">🦘 JUMP</button>
-    <button class="btn" id="btnRight">FORWARD ▶</button>
-  </div>
+  <div class="tap-hint">👆 স্ক্রিনের যেকোনো জায়গায় টাচ করে লাফ দিন!</div>
 </div>
 
 <script>
@@ -204,10 +176,11 @@ let cityBuildings = Array.from({length: 12}, (_, i) => ({
   color: `rgba(${Math.floor(Math.random()*30 + 15)}, ${Math.floor(Math.random()*40 + 20)}, ${Math.floor(Math.random()*70 + 40)}, 0.85)`
 }));
 
-// বর ও বউ সাইজ বড় করা হয়েছে (Large Characters)
+// বর ক্যারেক্টার (স্বয়ংক্রিয়ভাবে আস্তে আস্তে সামনে যাবে)
 let bor = { 
-  x: 80, y: groundY - 80, width: 65, height: 80, 
-  speed: 8.5, vy: 0, gravity: 0.65, 
+  x: 60, y: groundY - 80, width: 65, height: 80, 
+  autoForwardSpeed: 0.45, // আস্তে আস্তে সামনে এগিয়ে যাওয়ার স্পিড
+  vy: 0, gravity: 0.65, 
   jumpCount: 0, maxJumps: 2, isDead: false 
 };
 
@@ -224,7 +197,6 @@ const obstacleTypes = [
 ];
 
 let obstacle = { x: 900, y: groundY - 65, width: 50, height: 65, typeData: obstacleTypes[0] };
-let moveLeft = false, moveRight = false;
 
 function setDifficulty(level, e) {
   currentDifficulty = level;
@@ -232,48 +204,48 @@ function setDifficulty(level, e) {
   if(e && e.target) e.target.classList.add('active');
 
   if (level === 'easy') {
-    baseSpeed = 5;
+    baseSpeed = 4.5;
     bou.baseX = 580;
+    bor.autoForwardSpeed = 0.45;
   } else if (level === 'medium') {
-    baseSpeed = 7;
-    bou.baseX = 670;
+    baseSpeed = 6;
+    bou.baseX = 660;
+    bor.autoForwardSpeed = 0.35;
   } else if (level === 'hard') {
-    baseSpeed = 9;
-    bou.baseX = 760;
+    baseSpeed = 8;
+    bou.baseX = 740;
+    bor.autoForwardSpeed = 0.25;
   }
   restartGame();
 }
 
-function makeBorJump() {
-  if (bor.jumpCount < bor.maxJumps && !bor.isDead && !isGameWon) {
+function handleTapAction() {
+  if (isGameOver || isGameWon) {
+    restartGame();
+  } else if (bor.jumpCount < bor.maxJumps && !bor.isDead) {
     bor.vy = -13.5;
     bor.jumpCount++;
   }
 }
 
-// টাচপ্রুফ মোবাইল ইভেন্ট
-const bindTouch = (elem, startFn, endFn) => {
-  elem.addEventListener("touchstart", (e) => { e.preventDefault(); startFn(); }, { passive: false });
-  elem.addEventListener("touchend", (e) => { e.preventDefault(); if(endFn) endFn(); }, { passive: false });
-  elem.addEventListener("mousedown", startFn);
-  elem.addEventListener("mouseup", endFn);
-};
+// স্ক্রিনের বা ক্যানভাসের যেকোনো জায়গায় ক্লিক বা টাচ করলে লাফ দেবে
+window.addEventListener("touchstart", (e) => {
+  if (e.target.tagName !== 'BUTTON') {
+    e.preventDefault();
+    handleTapAction();
+  }
+}, { passive: false });
 
-bindTouch(document.getElementById("btnLeft"), () => moveLeft = true, () => moveLeft = false);
-bindTouch(document.getElementById("btnRight"), () => moveRight = true, () => moveRight = false);
-bindTouch(document.getElementById("btnJump"), () => makeBorJump());
-
-window.addEventListener("keydown", (e) => {
-  if (e.key === "ArrowLeft" || e.key === "a") moveLeft = true;
-  if (e.key === "ArrowRight" || e.key === "d") moveRight = true;
-  if (e.key === "ArrowUp" || e.key === "w" || e.key === " ") {
-    if (isGameOver || isGameWon) restartGame();
-    else makeBorJump();
+window.addEventListener("mousedown", (e) => {
+  if (e.target.tagName !== 'BUTTON') {
+    handleTapAction();
   }
 });
-window.addEventListener("keyup", (e) => {
-  if (e.key === "ArrowLeft" || e.key === "a") moveLeft = false;
-  if (e.key === "ArrowRight" || e.key === "d") moveRight = false;
+
+window.addEventListener("keydown", (e) => {
+  if (e.key === " " || e.key === "ArrowUp" || e.key === "w") {
+    handleTapAction();
+  }
 });
 
 function update() {
@@ -283,39 +255,47 @@ function update() {
   if (!bor.isDead && !isGameWon) {
     score++;
     if (score > highScore) highScore = score;
-    gameSpeed = baseSpeed + Math.floor(score / 350) * 0.5;
+    gameSpeed = baseSpeed + Math.floor(score / 400) * 0.4;
 
-    if (moveLeft && bor.x > 0) bor.x -= bor.speed;
-    if (moveRight) bor.x += bor.speed;
+    // বর আস্তে আস্তে স্বয়ংক্রিয়ভাবে সামনে এগিয়ে যাবে
+    if (bor.x < bou.x - 30) {
+      bor.x += bor.autoForwardSpeed;
+    }
 
-    let targetBouX = bou.baseX + Math.sin(score * 0.05) * 45; 
-    bou.x = Math.min(canvas.width - bou.width - 15, Math.max(300, targetBouX));
+    // বউ এর অবস্থান নির্ধারণ
+    let targetBouX = bou.baseX + Math.sin(score * 0.04) * 40; 
+    bou.x = Math.min(canvas.width - bou.width - 20, Math.max(300, targetBouX));
 
+    // বউকে ধরে ফেললে বিজয়ী!
     if (bor.x + bor.width >= bou.x + 10) {
       isGameWon = true;
       playSound(soundWin);
     }
 
+    // বরের গ্র্যাভিটি এবং জাম্প লজিক
     bor.y += bor.vy; bor.vy += bor.gravity;
     if (bor.y >= groundY - bor.height) {
       bor.y = groundY - bor.height;
       bor.jumpCount = 0;
     }
 
+    // বাধার মুভমেন্ট
     obstacle.x -= gameSpeed;
     if (obstacle.x + obstacle.width < 0) {
       const randomType = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
       obstacle.typeData = randomType;
       obstacle.width = randomType.width;
       obstacle.height = randomType.height;
-      obstacle.x = canvas.width + Math.random() * 200;
+      obstacle.x = canvas.width + Math.random() * 250;
       obstacle.y = (randomType.type === 'pit') ? groundY : groundY - randomType.height;
     }
 
+    // বউ বাধার ওপর দিয়ে লাফ দেবে
     if (obstacle.x - (bou.x + bou.width) < 70 && obstacle.x > bou.x && !bou.isJumping) {
       bou.vy = -13; bou.isJumping = true;
     }
 
+    // বাধা লাগলে গেম ওভার
     let isHit = false;
     if (obstacle.typeData.type === 'pit') {
       if (bor.x + bor.width > obstacle.x && bor.x < obstacle.x + obstacle.width && bor.y + bor.height >= groundY) isHit = true;
@@ -391,7 +371,7 @@ function draw() {
     }
   }
 
-  // HUD ড্যাশবোর্ড (বড় ও রেসপন্সিভ টেক্সট)
+  // HUD ড্যাশবোর্ড
   ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
   ctx.strokeStyle = "rgba(56, 189, 248, 0.5)";
   ctx.lineWidth = 2;
@@ -428,4 +408,35 @@ function draw() {
     ctx.textAlign = "center"; ctx.fillStyle = "#4ade80"; ctx.font = "900 40px Orbitron";
     ctx.fillText("VICTORY!! 💍🎉", canvas.width / 2, 175);
     ctx.fillStyle = "#38bdf8"; ctx.font = "bold 22px 'Hind Siliguri'";
-    ctx.fillText(`অভিনন্দন! আপনি ${currentDifficulty.toUpperCase()} TASFIA কে ধরে ফেলেছেন! ❤️`, canvas.width /
+    ctx.fillText(`অভিনন্দন! আপনি ${currentDifficulty.toUpperCase()} TASFIA কে ধরে ফেলেছেন! ❤️`, canvas.width / 2, 220);
+    ctx.fillStyle = "#9ca3af"; ctx.font = "bold 16px 'Hind Siliguri'";
+    ctx.fillText("আবার খেলতে স্ক্রিনে টাচ করুন 🔄", canvas.width / 2, 265);
+    ctx.textAlign = "left";
+  }
+}
+
+function gameLoop() {
+  update();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+function restartGame() {
+  soundWin.pause(); soundWin.currentTime = 0;
+  soundLose.pause(); soundLose.currentTime = 0;
+  isGameOver = false; isGameWon = false; bor.isDead = false;
+  score = 0; gameSpeed = baseSpeed;
+  bor.x = 60; bor.y = groundY - bor.height; bor.jumpCount = 0;
+  
+  if (currentDifficulty === 'easy') bou.baseX = 580;
+  else if (currentDifficulty === 'medium') bou.baseX = 660;
+  else if (currentDifficulty === 'hard') bou.baseX = 740;
+  
+  bou.x = bou.baseX;
+  obstacle.x = 900;
+}
+
+gameLoop();
+</script>
+</body>
+</html>
