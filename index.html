@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Catch Your Girl - Neon Edition</title>
+  <title>Catch Your Girl - Ultra Mobile HD</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Hind+Siliguri:wght@600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Hind+Siliguri:wght@700;800&display=swap');
     
     * { 
       margin: 0; 
@@ -34,64 +34,61 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-      background: rgba(15, 23, 42, 0.98);
-      padding: 12px;
-      border-radius: 20px;
-      border: 3px solid rgba(56, 189, 248, 0.4);
+      justify-content: center;
+      background: #090d16;
+      padding: 8px;
       width: 100vw;
       height: 100vh;
-      max-width: 1000px;
-      max-height: 650px;
-      box-shadow: 0 0 40px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(56, 189, 248, 0.15);
-    }
-
-    canvas {
-      border: 3px solid #38bdf8;
-      box-shadow: 0 0 30px rgba(56, 189, 248, 0.35);
-      background: #050811;
-      width: 100%;
-      height: 100%;
-      flex-grow: 1;
-      border-radius: 16px;
-      touch-action: none;
-      cursor: pointer;
+      max-width: 100%;
+      max-height: 100%;
     }
 
     .top-bar {
-      width: 100%;
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      margin-bottom: 8px;
-      padding: 0 4px;
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      z-index: 10;
     }
 
     .audio-btn {
-      background: #0f172a;
-      border: 2px solid rgba(255, 255, 255, 0.2);
+      background: rgba(15, 23, 42, 0.8);
+      border: 2px solid #38bdf8;
       color: #fff;
-      padding: 8px 16px;
-      border-radius: 10px;
-      font-size: 14px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
       font-weight: bold;
       cursor: pointer;
+      backdrop-filter: blur(4px);
+    }
+
+    canvas {
+      border: 2px solid #38bdf8;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+      background: #050811;
+      width: 100%;
+      height: 100%;
+      max-width: 950px;
+      max-height: 500px;
+      border-radius: 12px;
+      touch-action: none;
+      object-fit: contain;
     }
 
     .tap-hint {
       position: absolute;
-      bottom: 25px;
-      color: rgba(255, 255, 255, 0.85);
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: 1px;
+      bottom: 15px;
+      color: #7dd3fc;
+      font-size: 15px;
+      font-weight: 800;
       pointer-events: none;
-      animation: pulse 1.5s infinite;
-      text-shadow: 0 0 10px rgba(56, 189, 248, 0.8);
+      animation: pulse 1.2s infinite;
+      text-shadow: 0 0 8px rgba(56, 189, 248, 0.8);
+      z-index: 5;
     }
 
     @keyframes pulse {
-      0%, 100% { opacity: 0.5; transform: scale(0.98); }
+      0%, 100% { opacity: 0.6; transform: scale(0.98); }
       50% { opacity: 1; transform: scale(1.02); }
     }
   </style>
@@ -104,12 +101,21 @@
   </div>
 
   <canvas id="gameCanvas" width="900" height="420"></canvas>
-  <div class="tap-hint">👆 স্ক্রিনের যেকোনো জায়গায় টাচ করে লাফ দিন!</div>
+  <div class="tap-hint">👆 স্ক্রিনে টাচ করে লাফ দিন!</div>
 </div>
 
 <script>
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+
+// মোবাইলে ক্রিস্প ও শার্প দেখার জন্য HD Scaling
+function setupCanvasScaling() {
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = 900 * dpr;
+  canvas.height = 420 * dpr;
+  ctx.scale(dpr, dpr);
+}
+setupCanvasScaling();
 
 const imgBou = new Image(); imgBou.src = 'bou.jpg'; 
 const imgBor = new Image(); imgBor.src = 'bor.jpg'; 
@@ -137,43 +143,43 @@ let isGameOver = false, isGameWon = false;
 let score = 0, highScore = 0;
 let baseSpeed = 4.5, gameSpeed = 4.5;
 
-// ব্যাকগ্রাউন্ডের তারা ও নিওন বিল্ডিং
-let stars = Array.from({length: 50}, () => ({x: Math.random()*900, y: Math.random()*190, speed: Math.random()*0.5 + 0.1, size: Math.random()*2.5 + 1}));
-let cityBuildings = Array.from({length: 12}, (_, i) => ({
-  x: i * 85, 
-  width: 70, 
-  height: 60 + Math.random()*100,
+// স্টার ও সিটি ব্যাকগ্রাউন্ড
+let stars = Array.from({length: 40}, () => ({x: Math.random()*900, y: Math.random()*190, speed: Math.random()*0.5 + 0.1, size: Math.random()*2 + 1}));
+let cityBuildings = Array.from({length: 10}, (_, i) => ({
+  x: i * 100, 
+  width: 80, 
+  height: 70 + Math.random()*90,
   color: `rgba(${Math.floor(Math.random()*30 + 15)}, ${Math.floor(Math.random()*40 + 20)}, ${Math.floor(Math.random()*70 + 40)}, 0.85)`
 }));
 
-// ক্যারেক্টার সেটআপ
+// বর ও বউ (সাইজ বড় করা হয়েছে যাতে মোবাইলে স্পষ্ট দেখায়)
 let bor = { 
-  x: 80, y: groundY - 80, width: 65, height: 80, 
+  x: 80, y: groundY - 85, width: 70, height: 85, 
   autoForwardSpeed: 0.5, 
   vy: 0, gravity: 0.65, 
   jumpCount: 0, maxJumps: 2, isDead: false 
 };
 
 let bou = { 
-  x: 550, y: groundY - 80, width: 65, height: 80, 
+  x: 550, y: groundY - 85, width: 70, height: 85, 
   baseX: 550,
   speed: 1.2, vy: 0, gravity: 0.65, isJumping: false 
 };
 
-// সম্পূর্ণ নতুন ৩ ধরনের ফিউচারিস্টিক হাই-টেক বাধা
+// অত্যন্ত স্পষ্ট ৩টি বড় নিওন বাধা
 const obstacleTypes = [
-  { type: 'laser', width: 40, height: 75, color: '#ff0055' },
-  { type: 'spike', width: 60, height: 55, color: '#00f0ff' },
-  { type: 'portal', width: 70, height: 30, color: '#facc15' }
+  { type: 'laser', width: 45, height: 80 },
+  { type: 'spike', width: 65, height: 60 },
+  { type: 'portal', width: 80, height: 32 }
 ];
 
-let obstacle = { x: 900, y: groundY - 75, width: 40, height: 75, typeData: obstacleTypes[0] };
+let obstacle = { x: 900, y: groundY - 80, width: 45, height: 80, typeData: obstacleTypes[0] };
 
 function handleTapAction() {
   if (isGameOver || isGameWon) {
     restartGame();
   } else if (bor.jumpCount < bor.maxJumps && !bor.isDead) {
-    bor.vy = -13.5;
+    bor.vy = -13.8;
     bor.jumpCount++;
   }
 }
@@ -198,8 +204,8 @@ window.addEventListener("keydown", (e) => {
 });
 
 function update() {
-  stars.forEach(s => { s.x -= s.speed; if(s.x < 0) s.x = canvas.width; });
-  cityBuildings.forEach(b => { b.x -= gameSpeed * 0.25; if(b.x + b.width < 0) b.x = canvas.width + 10; });
+  stars.forEach(s => { s.x -= s.speed; if(s.x < 0) s.x = 900; });
+  cityBuildings.forEach(b => { b.x -= gameSpeed * 0.25; if(b.x + b.width < 0) b.x = 900 + 10; });
 
   if (!bor.isDead && !isGameWon) {
     score++;
@@ -211,7 +217,7 @@ function update() {
     }
 
     let targetBouX = bou.baseX + Math.sin(score * 0.04) * 35; 
-    bou.x = Math.min(canvas.width - bou.width - 20, Math.max(280, targetBouX));
+    bou.x = Math.min(900 - bou.width - 20, Math.max(280, targetBouX));
 
     if (bor.x + bor.width >= bou.x + 10) {
       isGameWon = true;
@@ -230,7 +236,7 @@ function update() {
       obstacle.typeData = randomType;
       obstacle.width = randomType.width;
       obstacle.height = randomType.height;
-      obstacle.x = canvas.width + Math.random() * 250;
+      obstacle.x = 900 + Math.random() * 250;
       obstacle.y = (randomType.type === 'portal') ? groundY - 5 : groundY - randomType.height;
     }
 
@@ -251,39 +257,34 @@ function update() {
       playSound(soundLose);
     }
   } else if (bor.isDead) {
-    if (bou.x < canvas.width + 100) bou.x += 6;
+    if (bou.x < 900 + 100) bou.x += 6;
   }
 
   bou.y += bou.vy; bou.vy += bou.gravity;
   if (bou.y >= groundY - bou.height) { bou.y = groundY - bou.height; bou.isJumping = false; }
 }
 
-// একদম নতুন ও গ্লোয়িং নিওন বাধা ড্র করার লজিক
-function drawUniqueObstacle(obs) {
+// মোবাইলের জন্য স্পষ্ট ও উজ্জ্বল বাধা
+function drawMobileHDObstacle(obs) {
   ctx.save();
   
   if (obs.typeData.type === 'laser') {
-    // টাইপ ১: লেজার বেরিয়ার (Red/Pink Neon Beam)
+    // হাই-ব্রাইটনেস লেজার বাধা
     ctx.shadowBlur = 20;
     ctx.shadowColor = "#ff0055";
     
-    // নিচের ও ওপরের পোল
-    ctx.fillStyle = "#1e293b";
-    ctx.fillRect(obs.x + 10, obs.y, 20, 15);
-    ctx.fillRect(obs.x + 10, obs.y + obs.height - 15, 20, 15);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(obs.x + 12, obs.y, 20, 16);
+    ctx.fillRect(obs.x + 12, obs.y + obs.height - 16, 20, 16);
     
-    // মাঝের লেজার বিম
-    let beamGrad = ctx.createLinearGradient(obs.x, 0, obs.x + obs.width, 0);
-    beamGrad.addColorStop(0, "rgba(255,0,85,0.3)");
-    beamGrad.addColorStop(0.5, "#ffffff");
-    beamGrad.addColorStop(1, "rgba(255,0,85,0.3)");
-    
-    ctx.fillStyle = beamGrad;
-    ctx.fillRect(obs.x + 14, obs.y + 12, 12, obs.height - 24);
+    ctx.fillStyle = "#ff0055";
+    ctx.fillRect(obs.x + 16, obs.y + 12, 12, obs.height - 24);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(obs.x + 20, obs.y + 12, 4, obs.height - 24);
   } 
   else if (obs.typeData.type === 'spike') {
-    // টাইপ ২: সাইবার ক্রিস্টাল স্পাইক (Cyan/Neon Blue Spikes)
-    ctx.shadowBlur = 20;
+    // নিওন সায়ান কন্টক বাধা
+    ctx.shadowBlur = 22;
     ctx.shadowColor = "#00f0ff";
     ctx.fillStyle = "#00f0ff";
     
@@ -296,62 +297,64 @@ function drawUniqueObstacle(obs) {
       ctx.lineTo(obs.x + (i + 1) * w, obs.y + obs.height);
       ctx.closePath();
       ctx.fill();
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 2;
+      ctx.stroke();
     }
   } 
   else if (obs.typeData.type === 'portal') {
-    // টাইপ ৩: এনার্জি ট্র্যাপ/পোর্টাল (Yellow/Gold Energy Line)
+    // নিওন গোল্ড এনার্জি ট্র্যাপ
     ctx.shadowBlur = 25;
     ctx.shadowColor = "#facc15";
     
-    ctx.fillStyle = "rgba(250, 204, 21, 0.25)";
-    ctx.fillRect(obs.x, obs.y, obs.width, 20);
+    ctx.fillStyle = "rgba(250, 204, 21, 0.4)";
+    ctx.fillRect(obs.x, obs.y, obs.width, 22);
     
     ctx.strokeStyle = "#facc15";
     ctx.lineWidth = 4;
-    ctx.strokeRect(obs.x, obs.y, obs.width, 20);
+    ctx.strokeRect(obs.x, obs.y, obs.width, 22);
     
-    // পালসিং এনার্জি লাইন
     ctx.fillStyle = "#ffffff";
-    let pX = obs.x + (score * 8) % obs.width;
-    ctx.fillRect(pX, obs.y, 10, 20);
+    let pX = obs.x + (score * 10) % (obs.width - 15);
+    ctx.fillRect(pX, obs.y, 15, 22);
   }
 
   ctx.restore();
 }
 
 function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, 900, 420);
 
-  let bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  bgGradient.addColorStop(0, "#050714");
-  bgGradient.addColorStop(0.7, "#0d182e");
+  let bgGradient = ctx.createLinearGradient(0, 0, 0, 420);
+  bgGradient.addColorStop(0, "#030712");
+  bgGradient.addColorStop(0.7, "#0b1329");
   bgGradient.addColorStop(1, "#1e293b");
   ctx.fillStyle = bgGradient;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, 900, 420);
 
   stars.forEach(s => {
-    ctx.fillStyle = `rgba(255, 255, 255, ${Math.random()*0.5 + 0.5})`;
+    ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
     ctx.fillRect(s.x, s.y, s.size, s.size);
   });
 
   cityBuildings.forEach(b => {
     ctx.fillStyle = b.color;
     ctx.fillRect(b.x, groundY - b.height, b.width, b.height);
-    ctx.fillStyle = "rgba(253, 224, 71, 0.35)";
+    ctx.fillStyle = "rgba(253, 224, 71, 0.4)";
     for(let wy = groundY - b.height + 10; wy < groundY - 10; wy += 22) {
-      ctx.fillRect(b.x + 10, wy, 10, 12);
-      ctx.fillRect(b.x + b.width - 20, wy, 10, 12);
+      ctx.fillRect(b.x + 12, wy, 12, 12);
+      ctx.fillRect(b.x + b.width - 24, wy, 12, 12);
     }
   });
 
-  // মাটি/রাস্তা
-  ctx.shadowBlur = 18; ctx.shadowColor = "#38bdf8";
-  ctx.strokeStyle = "#38bdf8"; ctx.lineWidth = 5;
-  ctx.beginPath(); ctx.moveTo(0, groundY); ctx.lineTo(canvas.width, groundY); ctx.stroke();
+  // রাস্তা/মাটি (মোটা নিওন ট্র্যাক)
+  ctx.shadowBlur = 15; ctx.shadowColor = "#38bdf8";
+  ctx.strokeStyle = "#38bdf8"; ctx.lineWidth = 6;
+  ctx.beginPath(); ctx.moveTo(0, groundY); ctx.lineTo(900, groundY); ctx.stroke();
   ctx.shadowBlur = 0;
 
   if (!isGameWon) {
-    drawUniqueObstacle(obstacle);
+    drawMobileHDObstacle(obstacle);
   }
 
   // বউ
@@ -370,44 +373,44 @@ function draw() {
     }
   }
 
-  // HUD ড্যাশবোর্ড
-  ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
-  ctx.strokeStyle = "rgba(56, 189, 248, 0.5)";
+  // HUD ড্যাশবোর্ড (সহজে দৃশ্যমান বড় ফন্ট)
+  ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+  ctx.strokeStyle = "#38bdf8";
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.roundRect(15, 12, 260, 60, 12);
+  ctx.roundRect(15, 12, 270, 62, 10);
   ctx.fill(); ctx.stroke();
 
   let dist = Math.max(0, Math.floor((bou.x - bor.x) / 10));
-  ctx.font = "bold 16px 'Hind Siliguri'";
-  ctx.fillStyle = "#f43f5e"; ctx.fillText(`বউয়ের দূরত্ব: ${dist}m 🏃‍♀️`, 25, 36);
-  ctx.fillStyle = "#fbbf24"; ctx.fillText(`সর্বোচ্চ স্কোর: ${highScore}`, 25, 58);
+  ctx.font = "bold 17px 'Hind Siliguri'";
+  ctx.fillStyle = "#ff4d6d"; ctx.fillText(`বউয়ের দূরত্ব: ${dist}m 🏃‍♀️`, 25, 36);
+  ctx.fillStyle = "#ffb703"; ctx.fillText(`সর্বোচ্চ স্কোর: ${highScore}`, 25, 60);
 
   // GAME OVER স্ক্রিন
   if (bor.isDead) {
-    ctx.fillStyle = "rgba(3, 7, 18, 0.94)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    if (imgGameOver.complete && imgGameOver.naturalWidth !== 0) ctx.drawImage(imgGameOver, canvas.width/2 - 55, 30, 110, 110);
+    ctx.fillStyle = "rgba(3, 7, 18, 0.95)";
+    ctx.fillRect(0, 0, 900, 420);
+    if (imgGameOver.complete && imgGameOver.naturalWidth !== 0) ctx.drawImage(imgGameOver, 900/2 - 55, 30, 110, 110);
     ctx.textAlign = "center"; ctx.fillStyle = "#ef4444"; ctx.font = "900 38px Orbitron";
-    ctx.fillText("GAME OVER", canvas.width / 2, 175);
+    ctx.fillText("GAME OVER", 900 / 2, 175);
     ctx.fillStyle = "#fbbf24"; ctx.font = "bold 22px 'Hind Siliguri'";
-    ctx.fillText("ধুর! SAYIM আটকে গেল! 💔", canvas.width / 2, 220);
+    ctx.fillText("ধুর! SAYIM আটকে গেল! 💔", 900 / 2, 220);
     ctx.fillStyle = "#9ca3af"; ctx.font = "bold 16px 'Hind Siliguri'";
-    ctx.fillText("আবার খেলতে স্ক্রিনে টাচ করুন 🔄", canvas.width / 2, 265);
+    ctx.fillText("আবার খেলতে স্ক্রিনে টাচ করুন 🔄", 900 / 2, 265);
     ctx.textAlign = "left";
   }
 
   // VICTORY SCREEN
   if (isGameWon) {
-    ctx.fillStyle = "rgba(3, 7, 18, 0.94)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    if (imgWin.complete && imgWin.naturalWidth !== 0) ctx.drawImage(imgWin, canvas.width/2 - 60, 25, 120, 120);
+    ctx.fillStyle = "rgba(3, 7, 18, 0.95)";
+    ctx.fillRect(0, 0, 900, 420);
+    if (imgWin.complete && imgWin.naturalWidth !== 0) ctx.drawImage(imgWin, 900/2 - 60, 25, 120, 120);
     ctx.textAlign = "center"; ctx.fillStyle = "#4ade80"; ctx.font = "900 40px Orbitron";
-    ctx.fillText("VICTORY!! 💍🎉", canvas.width / 2, 175);
+    ctx.fillText("VICTORY!! 💍🎉", 900 / 2, 175);
     ctx.fillStyle = "#38bdf8"; ctx.font = "bold 22px 'Hind Siliguri'";
-    ctx.fillText("অভিনন্দন! আপনি TASFIA কে ধরে ফেলেছেন! ❤️", canvas.width / 2, 220);
+    ctx.fillText("অভিনন্দন! আপনি TASFIA কে ধরে ফেলেছেন! ❤️", 900 / 2, 220);
     ctx.fillStyle = "#9ca3af"; ctx.font = "bold 16px 'Hind Siliguri'";
-    ctx.fillText("আবার খেলতে স্ক্রিনে টাচ করুন 🔄", canvas.width / 2, 265);
+    ctx.fillText("আবার খেলতে স্ক্রিনে টাচ করুন 🔄", 900 / 2, 265);
     ctx.textAlign = "left";
   }
 }
